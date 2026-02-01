@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS colors (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  rgb TEXT,
+  is_trans BOOLEAN NOT NULL DEFAULT false
+);

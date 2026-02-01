@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS themes (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  parent_id INTEGER REFERENCES themes(id),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
