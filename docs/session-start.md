@@ -7,7 +7,7 @@
 | Session                           | Status       |
 | --------------------------------- | ------------ |
 | 1A: Project Setup & DB Schema     | **Complete** |
-| 1B: Infrastructure & API Services | Pending      |
+| 1B: Infrastructure & API Services | **Complete** |
 | 1C: Data Seeding & Aggregation    | Pending      |
 | 2: Design System & Landing Page   | Pending      |
 | 3: Catalog, Search & Detail Pages | Pending      |
@@ -16,7 +16,7 @@
 
 ## What to Work on Next
 
-**Session 1B** — Rate limiter, base API client, logger, OAuth1 util, and 4 API service modules (Rebrickable, BrickLink, BrickEconomy, BrickOwl) with all response types.
+**Session 1C** — Download Rebrickable CSVs, seed 26K+ sets into DB, fetch prices from APIs, build price aggregation service, create cron-callable refresh script.
 
 ## Key References
 

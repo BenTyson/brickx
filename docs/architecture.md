@@ -10,6 +10,7 @@
 | Database  | Supabase (PostgreSQL)                      |
 | Auth      | Supabase Auth (Google/GitHub OAuth)        |
 | Dev Port  | 5699                                       |
+| Testing   | vitest (globals, node environment)         |
 | Scripts   | tsx (for standalone scripts in `scripts/`) |
 
 ## Directory Structure
@@ -39,9 +40,24 @@ brickx/
 │       │   ├── server.ts    # Server client (cookie-based)
 │       │   └── admin.ts     # Admin client (service role, bypasses RLS)
 │       ├── services/        # API clients and business logic
+│       │   ├── base-api-client.ts  # Generic HTTP client (retry, backoff, rate limiting)
+│       │   ├── rebrickable.ts      # Rebrickable API (catalog)
+│       │   ├── bricklink.ts        # BrickLink API (OAuth1 pricing)
+│       │   ├── brickeconomy.ts     # BrickEconomy API (valuations)
+│       │   └── brickowl.ts         # BrickOwl API (secondary pricing)
 │       ├── types/           # TypeScript type definitions
-│       │   └── database.ts  # Supabase Database type
+│       │   ├── database.ts         # Supabase Database type
+│       │   ├── api-common.ts       # ApiError, PaginatedResponse, BaseApiClientConfig
+│       │   ├── rebrickable.ts      # Rebrickable response types
+│       │   ├── bricklink.ts        # BrickLink response types
+│       │   ├── brickeconomy.ts     # BrickEconomy response types
+│       │   └── brickowl.ts         # BrickOwl response types
 │       ├── utils/           # Shared utilities
+│       │   ├── sleep.ts            # Promise-based sleep
+│       │   ├── logger.ts           # Structured JSON logger
+│       │   ├── rate-limiter.ts     # Token-bucket rate limiter
+│       │   ├── oauth1.ts           # OAuth 1.0a HMAC-SHA1 signing
+│       │   └── __tests__/          # Unit tests (vitest)
 │       └── env.ts           # Zod environment validation
 └── .env.example             # Environment variable template
 ```

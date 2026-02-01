@@ -7,12 +7,31 @@
 **Deliverables:** Next.js project on port 5699, 12 SQL migrations, Supabase client/server/admin modules, `/api/health` endpoint, 5 docs files
 **Verification:** `npm run dev`, `npx tsc --noEmit`, `npm run lint`, `npm run db:migrate`, `GET /api/health`
 
-## Session 1B: Infrastructure & API Services — Pending
+## Session 1B: Infrastructure & API Services — **Complete**
 
-**Goal:** Build rate limiter, base API client with retry/backoff, and 4 API service modules for external data sources.
+**Goal:** Build rate limiter, base API client with retry/backoff, logger, OAuth1 util, and 4 API service modules with response types. Install vitest and write unit tests.
 **Prerequisites:** 1A
-**Deliverables:** `rate-limiter.ts`, `base-api-client.ts`, `rebrickable.ts`, `bricklink.ts`, `brickeconomy.ts`, `brickowl.ts`, `logger.ts`, `oauth1.ts`, `sleep.ts`, 5 type files
-**Verification:** All type checks pass, unit tests for rate limiter and OAuth1 signing
+**Deliverables:**
+
+- `vitest.config.ts` — test runner config with `@/*` path alias
+- `src/lib/utils/sleep.ts` — Promise-based sleep
+- `src/lib/utils/logger.ts` — Structured JSON logger (debug/info/warn/error), level from `LOG_LEVEL`
+- `src/lib/utils/rate-limiter.ts` — Token-bucket rate limiter (lazy refill), factories for BrickLink/BrickEconomy/BrickOwl
+- `src/lib/utils/oauth1.ts` — OAuth 1.0a HMAC-SHA1 signing (node:crypto only)
+- `src/lib/types/api-common.ts` — `ApiError`, `ApiErrorCode`, `PaginatedResponse<T>`, `BaseApiClientConfig`
+- `src/lib/types/rebrickable.ts` — Set, Theme, Color, Part types, `SetListParams`
+- `src/lib/types/bricklink.ts` — `BrickLinkApiResponse<T>`, `BrickLinkPriceGuide`, `BrickLinkCondition`
+- `src/lib/types/brickeconomy.ts` — `BrickEconomySetValuation`
+- `src/lib/types/brickowl.ts` — `BrickOwlIdLookupResponse`, `BrickOwlPricingResponse`
+- `src/lib/services/base-api-client.ts` — Generic HTTP client (retry, backoff, rate limiting, timeout)
+- `src/lib/services/rebrickable.ts` — `getSets`, `getSet`, `getThemes`, `getColors`, `getParts`
+- `src/lib/services/bricklink.ts` — `BrickLinkApiClient` extends `BaseApiClient` for OAuth1, `getPriceGuide`
+- `src/lib/services/brickeconomy.ts` — `getSetValuation`
+- `src/lib/services/brickowl.ts` — `lookupId`, `getPricing`
+- `src/lib/utils/__tests__/rate-limiter.test.ts` — 12 tests
+- `src/lib/utils/__tests__/oauth1.test.ts` — 15 tests
+
+**Verification:** `npx tsc --noEmit`, `npm test` (27 tests pass), `npm run lint`, `npm run format:check`
 
 ## Session 1C: Data Seeding & Aggregation — Pending
 
