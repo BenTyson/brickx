@@ -11,12 +11,18 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:seed:catalog": "tsx scripts/seed-catalog.ts",
+    "db:seed:prices": "tsx scripts/seed-prices.ts",
+    "db:download-csvs": "tsx scripts/download-csvs.ts",
+    "db:refresh-prices": "tsx scripts/refresh-prices.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.93.3",
+    "csv-parse": "^6.1.0",
     "next": "16.1.6",
     "pg": "^8.18.0",
     "react": "19.2.3",

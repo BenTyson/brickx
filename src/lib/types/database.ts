@@ -23,6 +23,15 @@ export interface Database {
           parent_id?: number | null;
           created_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "themes_parent_id_fkey";
+            columns: ["parent_id"];
+            isOneToOne: false;
+            referencedRelation: "themes";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       sets: {
         Row: {
@@ -67,6 +76,15 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "sets_theme_id_fkey";
+            columns: ["theme_id"];
+            isOneToOne: false;
+            referencedRelation: "themes";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       set_prices: {
         Row: {
@@ -111,6 +129,15 @@ export interface Database {
           used_qty_sold?: number | null;
           fetched_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "set_prices_set_id_fkey";
+            columns: ["set_id"];
+            isOneToOne: false;
+            referencedRelation: "sets";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       set_market_values: {
         Row: {
@@ -146,6 +173,15 @@ export interface Database {
           investment_score?: number | null;
           updated_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "set_market_values_set_id_fkey";
+            columns: ["set_id"];
+            isOneToOne: true;
+            referencedRelation: "sets";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       colors: {
         Row: {
@@ -166,6 +202,7 @@ export interface Database {
           rgb?: string | null;
           is_trans?: boolean;
         };
+        Relationships: [];
       };
       parts: {
         Row: {
@@ -186,6 +223,7 @@ export interface Database {
           category_id?: number | null;
           img_url?: string | null;
         };
+        Relationships: [];
       };
       minifigs: {
         Row: {
@@ -206,6 +244,7 @@ export interface Database {
           num_parts?: number | null;
           img_url?: string | null;
         };
+        Relationships: [];
       };
       users: {
         Row: {
@@ -232,6 +271,7 @@ export interface Database {
           provider?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       collections: {
         Row: {
@@ -252,6 +292,15 @@ export interface Database {
           name?: string;
           created_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "collections_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       collection_items: {
         Row: {
@@ -287,6 +336,22 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [
+          {
+            foreignKeyName: "collection_items_collection_id_fkey";
+            columns: ["collection_id"];
+            isOneToOne: false;
+            referencedRelation: "collections";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "collection_items_set_id_fkey";
+            columns: ["set_id"];
+            isOneToOne: false;
+            referencedRelation: "sets";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: Record<string, never>;
