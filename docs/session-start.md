@@ -8,15 +8,15 @@
 | --------------------------------- | ------------ |
 | 1A: Project Setup & DB Schema     | **Complete** |
 | 1B: Infrastructure & API Services | **Complete** |
-| 1C: Data Seeding & Aggregation    | Pending      |
-| 2: Design System & Landing Page   | Pending      |
+| 1C: Data Seeding & Aggregation    | **Complete** |
+| 2: Design System & Landing Page   | **Complete** |
 | 3: Catalog, Search & Detail Pages | Pending      |
 | 4: Auth & Collection Management   | Pending      |
 | 5: Market Intelligence & Deploy   | Pending      |
 
 ## What to Work on Next
 
-**Session 1C** — Download Rebrickable CSVs, seed 26K+ sets into DB, fetch prices from APIs, build price aggregation service, create cron-callable refresh script.
+**Session 3** — Build browsable set catalog with search, filtering, sorting, and detailed set pages with pricing charts.
 
 ## Key References
 

@@ -6,7 +6,8 @@
 | --------- | ------------------------------------------ |
 | Framework | Next.js 15 (App Router)                    |
 | Language  | TypeScript (strict)                        |
-| Styling   | Tailwind CSS v4                            |
+| Styling   | Tailwind CSS v4 + shadcn/ui (new-york)     |
+| Theming   | next-themes (dark-first, class strategy)   |
 | Database  | Supabase (PostgreSQL)                      |
 | Auth      | Supabase Auth (Google/GitHub OAuth)        |
 | Dev Port  | 5699                                       |
@@ -25,16 +26,36 @@ brickx/
 │   ├── api-integrations.md  # External API details
 │   └── project/overview.md  # Business context
 ├── scripts/                 # Standalone TypeScript scripts (run with tsx)
-│   └── migrate.ts           # Database migration runner
+│   ├── migrate.ts           # Database migration runner
+│   ├── download-csvs.ts     # Download Rebrickable CSV.gz files to data/
+│   ├── seed-catalog.ts      # Parse CSVs, upsert into DB tables
+│   ├── seed-prices.ts       # Fetch prices from BrickLink/BrickEconomy/BrickOwl
+│   ├── seed.ts              # Orchestrator: download → catalog → prices
+│   └── refresh-prices.ts    # Cron-callable: refresh stale price data
 ├── supabase/
 │   └── migrations/          # SQL migration files (001-012)
 ├── data/                    # Downloaded data files (gitignored)
 ├── src/
 │   ├── app/                 # Next.js App Router pages and routes
 │   │   ├── api/             # API route handlers
-│   │   ├── layout.tsx       # Root layout
-│   │   └── page.tsx         # Home page
+│   │   ├── globals.css      # BrickX design tokens (OKLCH), shadcn CSS variables
+│   │   ├── layout.tsx       # Root layout (ThemeProvider, metadata)
+│   │   └── page.tsx         # Landing page (composed from sections)
+│   ├── components/          # React components
+│   │   ├── ui/              # shadcn/ui primitives (button, badge, card, sheet, etc.)
+│   │   ├── landing/         # Landing page sections (hero, stats, features, etc.)
+│   │   ├── logo.tsx         # BrickX logo (SVG, full/icon variants)
+│   │   ├── status-badge.tsx # Set status badge (available/retired/etc.)
+│   │   ├── price-change.tsx # Price change with colored arrows
+│   │   ├── set-card.tsx     # LEGO set card with pricing
+│   │   ├── stat-card.tsx    # Stat card with label, value, delta
+│   │   ├── site-header.tsx  # Sticky nav with backdrop-blur
+│   │   ├── mobile-nav.tsx   # Sheet-based mobile navigation
+│   │   ├── site-footer.tsx  # 4-column responsive footer
+│   │   ├── page-container.tsx # max-w-7xl page wrapper
+│   │   └── theme-provider.tsx # next-themes wrapper
 │   └── lib/
+│       ├── mock-data.ts     # Temporary mock LEGO set data (replaced by DB in Session 3)
 │       ├── supabase/        # Supabase client modules
 │       │   ├── client.ts    # Browser client (NEXT_PUBLIC_ vars)
 │       │   ├── server.ts    # Server client (cookie-based)
@@ -44,7 +65,9 @@ brickx/
 │       │   ├── rebrickable.ts      # Rebrickable API (catalog)
 │       │   ├── bricklink.ts        # BrickLink API (OAuth1 pricing)
 │       │   ├── brickeconomy.ts     # BrickEconomy API (valuations)
-│       │   └── brickowl.ts         # BrickOwl API (secondary pricing)
+│       │   ├── brickowl.ts         # BrickOwl API (secondary pricing)
+│       │   ├── price-aggregator.ts # Weighted price aggregation + investment scoring
+│       │   └── __tests__/          # Service unit tests (vitest)
 │       ├── types/           # TypeScript type definitions
 │       │   ├── database.ts         # Supabase Database type
 │       │   ├── api-common.ts       # ApiError, PaginatedResponse, BaseApiClientConfig
@@ -53,6 +76,7 @@ brickx/
 │       │   ├── brickeconomy.ts     # BrickEconomy response types
 │       │   └── brickowl.ts         # BrickOwl response types
 │       ├── utils/           # Shared utilities
+│       │   ├── cn.ts               # Tailwind class merge utility (shadcn)
 │       │   ├── sleep.ts            # Promise-based sleep
 │       │   ├── logger.ts           # Structured JSON logger
 │       │   ├── rate-limiter.ts     # Token-bucket rate limiter
@@ -65,11 +89,23 @@ brickx/
 ## Naming Conventions
 
 - **Files:** kebab-case (`rate-limiter.ts`, `base-api-client.ts`)
-- **Components:** PascalCase files and exports (`SetCard.tsx`)
+- **Components:** kebab-case files, PascalCase exports (`set-card.tsx` → `SetCard`)
 - **Types:** PascalCase (`SetRow`, `PriceInsert`)
 - **Constants:** UPPER_SNAKE_CASE
 - **Database tables:** snake_case plural (`set_prices`, `collection_items`)
 - **Database columns:** snake_case (`num_parts`, `fetched_at`)
+
+## Component Organization
+
+| Directory                 | Purpose                               |
+| ------------------------- | ------------------------------------- |
+| `src/components/ui/`      | shadcn/ui primitives (auto-generated) |
+| `src/components/`         | BrickX custom components (reusable)   |
+| `src/components/landing/` | Landing page sections (page-specific) |
+
+**shadcn/ui config:** `components.json` at project root. Utils alias: `@/lib/utils/cn` (avoids conflict with `src/lib/utils/` directory).
+
+**Theme:** Dark-first via `next-themes` (`defaultTheme="dark"`, `attribute="class"`). Design tokens as OKLCH CSS variables in `globals.css`. Custom BrickX tokens: `--success` (green), `--warning` (amber), `--info` (purple).
 
 ## Supabase Client Usage
 
@@ -97,6 +133,12 @@ brickx/
 All standalone scripts use `tsx` and are run from project root:
 
 ```bash
-tsx scripts/migrate.ts        # Run database migrations
-tsx scripts/seed.ts           # Seed all data (future)
+npm run db:migrate            # Run database migrations
+npm run db:seed               # Full pipeline: download CSVs → seed catalog → seed prices
+npm run db:seed:catalog       # Seed catalog only (requires CSVs in data/)
+npm run db:seed:prices        # Seed prices only (requires API keys)
+npm run db:download-csvs      # Download Rebrickable CSVs to data/
+npm run db:refresh-prices     # Refresh stale prices (cron-callable)
 ```
+
+Note: Scripts require `--env-file=.env.local` when run directly with `npx tsx`. The npm scripts handle this via tsx.

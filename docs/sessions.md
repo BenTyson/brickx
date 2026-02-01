@@ -33,19 +33,73 @@
 
 **Verification:** `npx tsc --noEmit`, `npm test` (27 tests pass), `npm run lint`, `npm run format:check`
 
-## Session 1C: Data Seeding & Aggregation — Pending
+## Session 1C: Data Seeding & Aggregation — **Complete**
 
 **Goal:** Download Rebrickable CSVs, seed 26K+ sets into DB, fetch prices from APIs, build price aggregation service, create cron-callable refresh script.
 **Prerequisites:** 1A + 1B
-**Deliverables:** `download-csvs.ts`, `seed-catalog.ts`, `seed-prices.ts`, `seed.ts`, `refresh-prices.ts`, `price-aggregator.ts`
-**Verification:** `npm run db:migrate && tsx scripts/seed.ts` populates tables, price aggregation returns computed values
+**Deliverables:**
 
-## Session 2: Design System & Landing Page — Pending
+- `scripts/download-csvs.ts` — Downloads 5 CSV.gz from Rebrickable CDN, stream-decompresses to `data/`. `--force` flag to re-download.
+- `scripts/seed-catalog.ts` — Parses CSVs, batch upserts into themes/colors/parts/minifigs/sets. Streaming for large tables, two-pass theme insertion for self-ref FK.
+- `scripts/seed-prices.ts` — Fetches prices from BrickLink/BrickEconomy/BrickOwl for prioritized sets (tiered selection). Concurrent per-set fetching, graceful failure handling. `--limit N` CLI arg.
+- `scripts/seed.ts` — Orchestrator: `downloadAll()` → `seedCatalog()` → `seedPrices()`. Price seeding auto-skipped without API keys.
+- `scripts/refresh-prices.ts` — Cron-callable refresh: stale set prioritization (user collections → stale → no prices). `--max-sets N`, `--stale-hours N` CLI args.
+- `src/lib/services/price-aggregator.ts` — Weighted average across sources (BL 0.50, BE 0.30, BO 0.20), pct change (7d/30d/90d), annualized growth, investment score (0–100).
+- `src/lib/services/__tests__/price-aggregator.test.ts` — 25 unit tests for all pure computation functions.
+- `src/lib/types/database.ts` — Added `Relationships` tuples to all table definitions (required by `@supabase/supabase-js` v2.93+).
+- `supabase/migrations/012_create_rls_policies.sql` — Fixed `CREATE POLICY IF NOT EXISTS` syntax (not supported in PG < 15, use `DROP POLICY IF EXISTS` + `CREATE POLICY`).
+- `package.json` — Added `csv-parse` dependency, 5 npm scripts (`db:seed`, `db:seed:catalog`, `db:seed:prices`, `db:download-csvs`, `db:refresh-prices`).
 
-**Goal:** Build component library (colors, typography, cards, navigation) and a responsive landing page.
+**Seeded data:** 488 themes, 275 colors, 60,815 parts, 16,532 minifigs, 26,095 sets. Price seeding deferred (no BrickLink/BrickEconomy/BrickOwl API access yet).
+**Verification:** `npx tsc --noEmit`, `npm test` (52 tests pass), `npm run lint`, `npm run format:check`, `npm run db:seed` populates all catalog tables.
+
+## Session 2: Design System & Landing Page — **Complete**
+
+**Goal:** Initialize shadcn/ui with Tailwind v4, define BrickX dark-first color palette, build reusable UI components, create navigation shell, and compose responsive marketing landing page.
 **Prerequisites:** 1A
-**Deliverables:** Design tokens, UI components, landing page with hero, feature highlights, CTA
-**Verification:** Visual review on mobile/desktop, Lighthouse accessibility score ≥90
+**Deliverables:**
+
+### Session 2A: shadcn/ui Init, Design Tokens & Theme Provider
+
+- `components.json` — shadcn/ui config (new-york style, zinc base, CSS variables, Lucide icons)
+- `src/lib/utils/cn.ts` — `cn()` utility (clsx + tailwind-merge), placed to avoid conflict with existing `src/lib/utils/` directory
+- `src/app/globals.css` — Full shadcn CSS variable system with BrickX dark-first OKLCH palette, custom tokens (success, warning, info), custom scrollbar, smooth scroll, selection color
+- `src/components/theme-provider.tsx` — `next-themes` wrapper (`defaultTheme="dark"`, `attribute="class"`, `enableSystem`, `disableTransitionOnChange`)
+- `src/app/layout.tsx` — Updated with ThemeProvider, `suppressHydrationWarning`, enriched metadata (OpenGraph, Twitter, keywords)
+- `src/components/ui/button.tsx` — shadcn Button (6 variants, 8 sizes)
+- `src/components/ui/badge.tsx` — shadcn Badge (6 variants)
+- `src/components/ui/card.tsx` — shadcn Card (7 sub-components)
+- `src/components/ui/navigation-menu.tsx` — shadcn NavigationMenu
+- `src/components/ui/sheet.tsx` — shadcn Sheet (slide-out drawer, 4 sides)
+- `src/components/ui/separator.tsx` — shadcn Separator
+- `src/components/ui/tooltip.tsx` — shadcn Tooltip
+- `package.json` — Added next-themes, clsx, tailwind-merge, class-variance-authority, lucide-react, @radix-ui/\* packages
+
+### Session 2B: Custom Components & Navigation Shell
+
+- `src/components/logo.tsx` — SVG brick icon + "BrickX" text, `full` and `icon` variants
+- `src/components/status-badge.tsx` — Colored badges for set status (available/retired/retiring-soon/exclusive/unreleased)
+- `src/components/price-change.tsx` — Percentage change display with colored arrows (green up, red down)
+- `src/components/set-card.tsx` — LEGO set card with placeholder image, status badge, pricing, and hover animation
+- `src/components/stat-card.tsx` — Stat card with label, value, optional delta and icon
+- `src/components/site-header.tsx` — Sticky top nav with backdrop-blur, desktop nav links, Sign In/Get Started buttons
+- `src/components/mobile-nav.tsx` — Sheet-based mobile navigation (slide-from-left)
+- `src/components/site-footer.tsx` — 4-column responsive footer (brand, product, resources, company)
+- `src/components/page-container.tsx` — `max-w-7xl` page width wrapper
+- `src/lib/mock-data.ts` — 8 hardcoded LEGO sets with pricing data for visual development
+
+### Session 2C: Landing Page & Accessibility Polish
+
+- `src/components/landing/hero-section.tsx` — Full-viewport hero with gradient, headline, CTAs, CSS dashboard mockup
+- `src/components/landing/stats-section.tsx` — 4 stats: 26K+ sets, real-time pricing, ~11% returns, 100% free
+- `src/components/landing/features-section.tsx` — 3 feature cards (Portfolio Tracking, Price Intelligence, Investment Insights)
+- `src/components/landing/featured-sets-section.tsx` — Grid of 6 SetCards from mock data
+- `src/components/landing/how-it-works-section.tsx` — 3 numbered steps with connecting line
+- `src/components/landing/cta-section.tsx` — CTA card with gradient and "No credit card required"
+- `src/app/page.tsx` — Composed landing page (SiteHeader → Hero → Stats → Features → FeaturedSets → HowItWorks → CTA → SiteFooter) with skip-to-content link
+
+**Accessibility:** Skip-to-content link, proper heading hierarchy (single h1, h2 per section, h3 for sub-items), ARIA labels on nav/logo/icon buttons, 44px+ touch targets, high contrast ratios (foreground on background: 19.4:1)
+**Verification:** `npx tsc --noEmit`, `npm test` (52 tests pass), `npm run lint`, `npm run format:check`, visual review at 375px/768px/1440px
 
 ## Session 3: Catalog, Search & Detail Pages — Pending
 
