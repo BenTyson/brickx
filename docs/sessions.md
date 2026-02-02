@@ -234,9 +234,67 @@
 
 **Verification:** `npx tsc --noEmit`, `npm run lint`, `npm run format:check` all pass
 
-## Session 5: Market Intelligence & Deploy — Pending
+## Session 5: Market Intelligence, Alerts & SEO — **Complete**
 
-**Goal:** Investment scoring, market trends, price alerts, and production deployment.
+**Goal:** Market intelligence pages, price alerts system, SEO infrastructure, and production polish.
 **Prerequisites:** 4
-**Deliverables:** Investment score algorithm, trending sets page, price alert system, Vercel deployment, production Supabase
-**Verification:** Deployed app accessible, scores computed, alerts trigger on threshold
+
+### Phase 5A: Market Intelligence Pages
+
+- `src/lib/queries/helpers.ts` — Extracted shared `SetRow` interface and `flattenSetRow()` from duplicated code in `sets.ts` and `set-detail.ts`
+- `src/lib/queries/market.ts` — `fetchTrendingSets()` (7d/30d period toggle), `fetchRetiringSets()`, `fetchNewReleases()`, `fetchTopInvestments()` (optional price range filter)
+- `src/lib/queries/sets.ts` — Refactored to import `SetRow`/`flattenSetRow` from helpers
+- `src/lib/queries/set-detail.ts` — Same import refactor
+- `src/lib/queries/index.ts` — Added market + alert query exports
+- `src/components/market/market-hub-card.tsx` — Category card with icon, description, link
+- `src/components/market/period-toggle.tsx` (client) — Tabs for 7d/30d trending period, updates URL
+- `src/components/market/price-range-filter.tsx` (client) — Min/max MSRP inputs for top investments
+- `src/components/market/investment-score-badge.tsx` — Color-coded 0-100 score display
+- `src/components/market/market-pagination.tsx` (client) — Reusable pagination with configurable basePath
+- `src/app/market/layout.tsx` — SiteHeader + main + SiteFooter (same pattern as sets)
+- `src/app/market/page.tsx` — Hub page: 4 category cards + preview of top 6 trending sets
+- `src/app/market/loading.tsx` — Hub skeleton
+- `src/app/market/trending/page.tsx` — 7d/30d toggle, SetCard grid, pagination
+- `src/app/market/trending/loading.tsx` — Trending skeleton
+- `src/app/market/retiring/page.tsx` — Retired sets grid, pagination
+- `src/app/market/retiring/loading.tsx` — Retiring skeleton
+- `src/app/market/new-releases/page.tsx` — New sets grid (current year - 1), pagination
+- `src/app/market/new-releases/loading.tsx` — New releases skeleton
+- `src/app/market/top-investments/page.tsx` — Price range filter, SetCard grid, pagination
+- `src/app/market/top-investments/loading.tsx` — Top investments skeleton
+- `src/components/site-header.tsx` — Added "Market" nav link
+- `src/components/mobile-nav.tsx` — Added "Market" nav link
+- `src/components/site-footer.tsx` — Updated Trending link to `/market/trending`
+
+### Phase 5B: Price Alerts System
+
+- `supabase/migrations/014_create_price_alerts.sql` — `price_alerts` table with `alert_type` enum (price_drop/price_target/value_exceeded), `alert_status` enum (active/triggered/dismissed), indexes, RLS policies
+- `supabase/migrations/015_create_notification_preferences.sql` — `notification_preferences` table (user_id PK, email/price_drop/value_exceeded toggles), RLS policies
+- `src/lib/types/database.ts` — Added `AlertType`, `AlertStatus`, `price_alerts` and `notification_preferences` table types + enums
+- `src/lib/types/alerts.ts` — `PriceAlert`, `NotificationPreferences` interfaces
+- `src/lib/queries/alerts.ts` — `fetchUserAlerts()` (with status filter + set join), `fetchUnreadAlertCount()`, `fetchNotificationPreferences()`
+- `src/lib/actions/alerts.ts` — `createPriceAlert`, `dismissAlert`, `markAlertRead`, `markAllAlertsRead`, `deleteAlert`, `updateNotificationPreferences`
+- `src/components/alerts/notification-bell.tsx` (client) — Bell icon + unread badge count in header
+- `src/components/alerts/alert-list.tsx` (client) — Alert cards with set info, status badge, read/dismiss/delete actions
+- `src/components/alerts/create-alert-dialog.tsx` (client) — Dialog to create alert on a set (type selector, target price/threshold inputs)
+- `src/components/alerts/notification-preferences-form.tsx` (client) — Toggle switches for email/price_drop/value_exceeded preferences
+- `src/app/(app)/alerts/page.tsx` — Alert list with Active/Triggered/All tabs, mark all read button
+- `src/app/(app)/alerts/loading.tsx` — Alerts skeleton
+- `src/app/(app)/alerts/preferences/page.tsx` — Notification preferences form
+- `src/components/site-header.tsx` — Added NotificationBell next to UserMenu
+- `src/components/auth/user-menu.tsx` — Added "Alerts" dropdown item (desktop + mobile)
+- `src/app/sets/[id]/page.tsx` — Added CreateAlertDialog button (auth-gated)
+- `src/components/ui/switch.tsx` — Added via shadcn/ui
+
+### Phase 5C: SEO & Production Polish
+
+- `src/app/sitemap.ts` — Dynamic sitemap with all static pages + ~26K set detail pages (uses service role key)
+- `src/app/robots.ts` — Allow all except `/api/`, `/collections/`, `/portfolio/`, `/alerts/`
+- `src/components/json-ld.tsx` — Generic JSON-LD script injector component
+- `src/app/layout.tsx` — Added WebSite JSON-LD with SearchAction schema
+- `src/app/sets/[id]/page.tsx` — Added Product JSON-LD per set (name, SKU, brand, image, offers)
+- `next.config.ts` — `poweredByHeader: false`, `compress: true`
+- `src/app/api/health/route.ts` — Added `price_alerts` to monitored tables
+- `src/app/(auth)/sign-in/page.tsx` — Fixed pre-existing build error: wrapped SignInForm in Suspense boundary
+
+**Verification:** `npx tsc --noEmit`, `npm run lint`, `npm run format:check`, `npm run build` — all pass

@@ -5,6 +5,8 @@
 ```sql
 set_status: 'available' | 'retired' | 'unreleased'
 item_condition: 'new' | 'used'
+alert_type: 'price_drop' | 'price_target' | 'value_exceeded'
+alert_status: 'active' | 'triggered' | 'dismissed'
 ```
 
 ## Tables
@@ -127,6 +129,34 @@ item_condition: 'new' | 'used'
 | created_at     | TIMESTAMPTZ    | DEFAULT now()                                    |
 | updated_at     | TIMESTAMPTZ    | DEFAULT now()                                    |
 
+### price_alerts
+
+| Column          | Type          | Constraints                                |
+| --------------- | ------------- | ------------------------------------------ |
+| id              | UUID          | PK, DEFAULT gen_random_uuid()              |
+| user_id         | UUID          | FK → users(id) ON DELETE CASCADE, NOT NULL |
+| set_id          | TEXT          | FK → sets(id) ON DELETE CASCADE, NOT NULL  |
+| alert_type      | alert_type    | NOT NULL                                   |
+| target_price    | NUMERIC(10,2) |                                            |
+| threshold_pct   | NUMERIC(5,2)  |                                            |
+| is_read         | BOOLEAN       | DEFAULT false                              |
+| status          | alert_status  | DEFAULT 'active'                           |
+| triggered_at    | TIMESTAMPTZ   |                                            |
+| triggered_value | NUMERIC(10,2) |                                            |
+| created_at      | TIMESTAMPTZ   | DEFAULT now()                              |
+| updated_at      | TIMESTAMPTZ   | DEFAULT now()                              |
+
+### notification_preferences
+
+| Column                | Type        | Constraints                          |
+| --------------------- | ----------- | ------------------------------------ |
+| user_id               | UUID        | PK, FK → users(id) ON DELETE CASCADE |
+| email_alerts          | BOOLEAN     | DEFAULT true                         |
+| price_drop_alerts     | BOOLEAN     | DEFAULT true                         |
+| value_exceeded_alerts | BOOLEAN     | DEFAULT true                         |
+| created_at            | TIMESTAMPTZ | DEFAULT now()                        |
+| updated_at            | TIMESTAMPTZ | DEFAULT now()                        |
+
 ## Relationships
 
 ```
@@ -137,6 +167,9 @@ set_market_values.set_id → sets.id
 collections.user_id → users.id (CASCADE)
 collection_items.collection_id → collections.id (CASCADE)
 collection_items.set_id → sets.id
+price_alerts.user_id → users.id (CASCADE)
+price_alerts.set_id → sets.id (CASCADE)
+notification_preferences.user_id → users.id (CASCADE)
 ```
 
 ## Indexes
@@ -149,12 +182,15 @@ collection_items.set_id → sets.id
 | idx_sets_status                 | sets             | status                  |
 | idx_set_prices_set_fetched      | set_prices       | set_id, fetched_at DESC |
 | idx_collection_items_collection | collection_items | collection_id           |
+| idx_price_alerts_user_id        | price_alerts     | user_id                 |
+| idx_price_alerts_user_status    | price_alerts     | user_id, status         |
+| idx_price_alerts_set_id         | price_alerts     | set_id                  |
 
 ## RLS Policies
 
 **Public read** (no auth required): themes, sets, set_prices, set_market_values, colors, parts, minifigs
 
-**User-scoped CRUD** (auth.uid() = user_id): users (SELECT/INSERT/UPDATE own row), collections (full CRUD own rows), collection_items (full CRUD via collection ownership)
+**User-scoped CRUD** (auth.uid() = user_id): users (SELECT/INSERT/UPDATE own row), collections (full CRUD own rows), collection_items (full CRUD via collection ownership), price_alerts (full CRUD own rows), notification_preferences (SELECT/INSERT/UPDATE own row)
 
 ## Triggers
 

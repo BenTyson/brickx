@@ -34,7 +34,7 @@ brickx/
 │   ├── seed.ts              # Orchestrator: download → catalog → prices
 │   └── refresh-prices.ts    # Cron-callable: refresh stale price data
 ├── supabase/
-│   └── migrations/          # SQL migration files (001-013)
+│   └── migrations/          # SQL migration files (001-015)
 ├── data/                    # Downloaded data files (gitignored)
 ├── src/
 │   ├── app/                 # Next.js App Router pages and routes
@@ -46,8 +46,18 @@ brickx/
 │   │   │   └── sign-up/page.tsx
 │   │   ├── (app)/           # Auth-required route group — redirects to /sign-in
 │   │   │   ├── layout.tsx
+│   │   │   ├── alerts/      # Price alerts list + preferences
 │   │   │   ├── collections/ # Collections list + detail pages
 │   │   │   └── portfolio/   # Portfolio dashboard
+│   │   ├── market/          # Market intelligence pages (public)
+│   │   │   ├── layout.tsx
+│   │   │   ├── page.tsx         # Hub: category cards + trending preview
+│   │   │   ├── trending/        # 7d/30d price movers
+│   │   │   ├── retiring/        # Retired sets
+│   │   │   ├── new-releases/    # Recent releases
+│   │   │   └── top-investments/ # Highest investment scores
+│   │   ├── sitemap.ts       # Dynamic sitemap (~26K set pages)
+│   │   ├── robots.ts        # Robots.txt (disallow private routes)
 │   │   ├── sets/            # Catalog & detail pages
 │   │   │   ├── layout.tsx   # Shared layout (SiteHeader + main + SiteFooter)
 │   │   │   ├── page.tsx     # Catalog browse: search, filter, sort, paginate
@@ -61,13 +71,16 @@ brickx/
 │   │   ├── layout.tsx       # Root layout (ThemeProvider, metadata)
 │   │   └── page.tsx         # Landing page (composed from sections)
 │   ├── components/          # React components
-│   │   ├── ui/              # shadcn/ui primitives (button, badge, card, sheet, dialog, dropdown-menu, avatar, tabs, etc.)
+│   │   ├── ui/              # shadcn/ui primitives (button, badge, card, sheet, dialog, dropdown-menu, avatar, tabs, switch, etc.)
+│   │   ├── alerts/          # Alert components (notification-bell, alert-list, create-dialog, preferences)
 │   │   ├── auth/            # Auth components (sign-in-form, sign-up-form, user-menu)
 │   │   ├── catalog/         # Catalog page components (search, sort, filters, grid, pagination)
 │   │   ├── collections/     # Collection components (card, dialogs, items table)
 │   │   ├── detail/          # Detail page components (breadcrumb, stats, chart, related, add-to-collection)
 │   │   ├── landing/         # Landing page sections (hero, stats, features, etc.)
+│   │   ├── market/          # Market intelligence components (hub-card, period-toggle, price-filter, pagination)
 │   │   ├── portfolio/       # Portfolio components (summary cards, breakdown table)
+│   │   ├── json-ld.tsx      # Generic JSON-LD script injector
 │   │   ├── logo.tsx         # BrickX logo (SVG, full/icon variants)
 │   │   ├── status-badge.tsx # Set status badge (available/retired/etc.)
 │   │   ├── price-change.tsx # Price change with colored arrows
@@ -81,13 +94,17 @@ brickx/
 │   └── lib/
 │       ├── actions/         # Server actions
 │       │   ├── auth.ts      # signOut()
+│       │   ├── alerts.ts    # createPriceAlert, dismissAlert, markAlertRead, markAllAlertsRead, deleteAlert, updateNotificationPreferences
 │       │   └── collections.ts # create/rename/delete collection, add/update/remove items
 │       ├── mock-data.ts     # Mock LEGO set data (CatalogSet shape, used by landing page)
 │       ├── queries/         # Server-side data access (Supabase queries)
 │       │   ├── index.ts     # Barrel export
+│       │   ├── helpers.ts   # Shared SetRow interface + flattenSetRow()
 │       │   ├── sets.ts      # fetchCatalogSets, parseCatalogSearchParams, fetchFilterOptions
 │       │   ├── set-detail.ts # fetchSetDetail, fetchPriceHistory, fetchRelatedSets
-│       │   └── collections.ts # fetchUserCollections, fetchCollectionDetail, fetchPortfolioSummary
+│       │   ├── collections.ts # fetchUserCollections, fetchCollectionDetail, fetchPortfolioSummary
+│       │   ├── market.ts    # fetchTrendingSets, fetchRetiringSets, fetchNewReleases, fetchTopInvestments
+│       │   └── alerts.ts    # fetchUserAlerts, fetchUnreadAlertCount, fetchNotificationPreferences
 │       ├── supabase/        # Supabase client modules
 │       │   ├── client.ts    # Browser client (NEXT_PUBLIC_ vars)
 │       │   ├── server.ts    # Server client (cookie-based)
@@ -102,8 +119,9 @@ brickx/
 │       │   ├── price-aggregator.ts # Weighted price aggregation + investment scoring
 │       │   └── __tests__/          # Service unit tests (vitest)
 │       ├── types/           # TypeScript type definitions
-│       │   ├── database.ts         # Supabase Database type
+│       │   ├── database.ts         # Supabase Database type (12 tables, 4 enums)
 │       │   ├── catalog.ts          # CatalogSet, CatalogSearchParams, CatalogResult, PriceHistoryPoint, CatalogFilterOptions
+│       │   ├── alerts.ts           # PriceAlert, NotificationPreferences
 │       │   ├── collection.ts       # CollectionSummary, CollectionItem, CollectionWithItems, PortfolioSummary
 │       │   ├── api-common.ts       # ApiError, PaginatedResponse, BaseApiClientConfig
 │       │   ├── rebrickable.ts      # Rebrickable response types
@@ -137,11 +155,13 @@ brickx/
 | ----------------------------- | ------------------------------------------------------------------------ |
 | `src/components/ui/`          | shadcn/ui primitives (auto-generated)                                    |
 | `src/components/`             | BrickX custom components (reusable across pages)                         |
+| `src/components/alerts/`      | Alert components (notification bell, alert list, create dialog, prefs)   |
 | `src/components/auth/`        | Auth components (sign-in/up forms, user menu)                            |
 | `src/components/catalog/`     | Catalog page components (search, filters, grid)                          |
 | `src/components/collections/` | Collection components (card, CRUD dialogs, items table)                  |
 | `src/components/detail/`      | Set detail page components (breadcrumb, stats, chart, add-to-collection) |
 | `src/components/landing/`     | Landing page sections (page-specific)                                    |
+| `src/components/market/`      | Market intelligence components (hub card, toggles, filters, pagination)  |
 | `src/components/portfolio/`   | Portfolio components (summary cards, breakdown table)                    |
 
 **shadcn/ui config:** `components.json` at project root. Utils alias: `@/lib/utils/cn` (avoids conflict with `src/lib/utils/` directory).
