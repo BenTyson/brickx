@@ -8,3 +8,9 @@ export {
   fetchPriceHistory,
   fetchRelatedSets,
 } from "./set-detail";
+export {
+  fetchUserCollections,
+  fetchCollectionDetail,
+  fetchCollectionsContainingSet,
+  fetchPortfolioSummary,
+} from "./collections";

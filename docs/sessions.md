@@ -179,12 +179,60 @@
 
 **Verification:** `npx tsc --noEmit`, `npm test` (52 tests pass), `npm run lint`
 
-## Session 4: Auth & Collection Management — Pending
+## Session 4: Auth & Collection Management — **Complete**
 
-**Goal:** Supabase Auth (Google/GitHub OAuth), user collections with CRUD, portfolio value tracking.
+**Goal:** Supabase Auth (email/password + OAuth), user collections with CRUD, portfolio value tracking, auth-reactive header.
 **Prerequisites:** 2 + 3
-**Deliverables:** Auth flow, collection CRUD pages, portfolio dashboard, RLS enforcement
-**Verification:** Login/logout works, collections persist, RLS blocks cross-user access
+
+### Phase 4A: Auth Infrastructure
+
+- `supabase/migrations/013_auth_user_sync.sql` — INSERT policy on `users`, `handle_new_user()` trigger (SECURITY DEFINER) syncing `auth.users` → `public.users` with ON CONFLICT DO UPDATE
+- `src/middleware.ts` — Supabase SSR middleware: cookie refresh on every request, matcher excludes static assets
+- `src/app/auth/callback/route.ts` — OAuth/email code exchange, redirects to `next` param or `/`
+- `src/app/(auth)/layout.tsx` — SiteHeader + centered content + SiteFooter
+- `src/app/(auth)/sign-in/page.tsx` — Server shell + metadata
+- `src/app/(auth)/sign-up/page.tsx` — Server shell + metadata
+- `src/components/auth/sign-in-form.tsx` — Client component: email/password + Google/GitHub OAuth buttons, `?next=` redirect support
+- `src/components/auth/sign-up-form.tsx` — Client component: email/password/name, confirmation message on success
+- `src/lib/actions/auth.ts` — Server action: `signOut()` → redirect to `/`
+- shadcn/ui components installed: `dropdown-menu`, `avatar`, `dialog`, `tabs`
+- `next.config.ts` — Added `lh3.googleusercontent.com` + `avatars.githubusercontent.com` to `images.remotePatterns`
+- `.env.example` — Added optional OAuth env var placeholders (Google/GitHub)
+
+### Phase 4B: Collection CRUD
+
+- `src/lib/types/collection.ts` — `CollectionSummary`, `CollectionItem`, `CollectionWithItems`, `PortfolioSummary`
+- `src/lib/queries/collections.ts` — `fetchUserCollections()`, `fetchCollectionDetail()`, `fetchCollectionsContainingSet()`, `fetchPortfolioSummary()`
+- `src/lib/queries/index.ts` — Updated barrel export with collection queries
+- `src/lib/actions/collections.ts` — `createCollection`, `renameCollection`, `deleteCollection`, `addItemToCollection`, `updateCollectionItem`, `removeCollectionItem`
+- `src/app/(app)/layout.tsx` — Auth-required layout: checks `getUser()`, redirects to `/sign-in` if not authenticated
+- `src/app/(app)/collections/page.tsx` — Collections list with grid of cards + empty state
+- `src/app/(app)/collections/loading.tsx` — Skeleton
+- `src/app/(app)/collections/[id]/page.tsx` — Collection detail: breadcrumb, summary bar, items table, 404 handling
+- `src/app/(app)/collections/[id]/loading.tsx` — Skeleton
+- `src/components/collections/collection-card.tsx` — Name, item count, dropdown actions (rename/delete)
+- `src/components/collections/create-collection-dialog.tsx` — Name input + create action
+- `src/components/collections/rename-collection-dialog.tsx` — Pre-filled rename
+- `src/components/collections/delete-collection-dialog.tsx` — Confirmation dialog
+- `src/components/collections/collection-items-table.tsx` — Responsive table: image, set name, condition, purchase price, current value, gain/loss, actions
+- `src/components/collections/edit-item-dialog.tsx` — Edit condition, price, date, notes
+- `src/components/detail/add-to-collection-button.tsx` — "Sign in to collect" (logged out) or opens dialog (logged in)
+- `src/components/detail/add-to-collection-dialog.tsx` — Collection picker, inline create, condition/price/date/notes fields
+- `src/app/sets/[id]/page.tsx` — Modified: added auth check, AddToCollectionButton
+
+### Phase 4C: Portfolio Dashboard & Header Integration
+
+- `src/lib/supabase/auth.ts` — `getUser()` and `getUserProfile()` server-side helpers
+- `src/components/auth/user-menu.tsx` — `UserMenu` (desktop dropdown) + `MobileUserMenu` (sheet items), reactive via `onAuthStateChange`
+- `src/components/site-header.tsx` — Modified: replaced hardcoded auth buttons with `<UserMenu />`, nav links: Browse/Collections/Portfolio
+- `src/components/mobile-nav.tsx` — Modified: replaced hardcoded buttons with `<MobileUserMenu />`, same nav links
+- `src/components/site-footer.tsx` — Modified: Portfolio link → `/portfolio`
+- `src/app/(app)/portfolio/page.tsx` — Summary cards + collection breakdown table, empty state with CTA
+- `src/app/(app)/portfolio/loading.tsx` — Skeleton
+- `src/components/portfolio/portfolio-summary-cards.tsx` — 4 StatCards: total value, cost basis, gain/loss, total sets
+- `src/components/portfolio/collections-breakdown-table.tsx` — Per-collection table: name, items, value, cost, gain/loss %
+
+**Verification:** `npx tsc --noEmit`, `npm run lint`, `npm run format:check` all pass
 
 ## Session 5: Market Intelligence & Deploy — Pending
 

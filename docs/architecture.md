@@ -4,7 +4,7 @@
 
 | Layer     | Technology                                 |
 | --------- | ------------------------------------------ |
-| Framework | Next.js 15 (App Router)                    |
+| Framework | Next.js 16 (App Router)                    |
 | Language  | TypeScript (strict)                        |
 | Styling   | Tailwind CSS v4 + shadcn/ui (new-york)     |
 | Theming   | next-themes (dark-first, class strategy)   |
@@ -34,16 +34,25 @@ brickx/
 │   ├── seed.ts              # Orchestrator: download → catalog → prices
 │   └── refresh-prices.ts    # Cron-callable: refresh stale price data
 ├── supabase/
-│   └── migrations/          # SQL migration files (001-012)
+│   └── migrations/          # SQL migration files (001-013)
 ├── data/                    # Downloaded data files (gitignored)
 ├── src/
 │   ├── app/                 # Next.js App Router pages and routes
 │   │   ├── api/             # API route handlers
+│   │   ├── auth/callback/   # OAuth/email code exchange route
+│   │   ├── (auth)/          # Auth route group (sign-in, sign-up) — centered layout
+│   │   │   ├── layout.tsx
+│   │   │   ├── sign-in/page.tsx
+│   │   │   └── sign-up/page.tsx
+│   │   ├── (app)/           # Auth-required route group — redirects to /sign-in
+│   │   │   ├── layout.tsx
+│   │   │   ├── collections/ # Collections list + detail pages
+│   │   │   └── portfolio/   # Portfolio dashboard
 │   │   ├── sets/            # Catalog & detail pages
 │   │   │   ├── layout.tsx   # Shared layout (SiteHeader + main + SiteFooter)
 │   │   │   ├── page.tsx     # Catalog browse: search, filter, sort, paginate
 │   │   │   ├── loading.tsx  # Catalog skeleton loading state
-│   │   │   └── [id]/        # Set detail page
+│   │   │   └── [id]/        # Set detail page (+ AddToCollectionButton)
 │   │   │       ├── page.tsx     # Detail: hero, market stats, price chart, related sets
 │   │   │       ├── loading.tsx  # Detail skeleton loading state
 │   │   │       └── not-found.tsx # Set-specific 404
@@ -52,30 +61,38 @@ brickx/
 │   │   ├── layout.tsx       # Root layout (ThemeProvider, metadata)
 │   │   └── page.tsx         # Landing page (composed from sections)
 │   ├── components/          # React components
-│   │   ├── ui/              # shadcn/ui primitives (button, badge, card, sheet, etc.)
+│   │   ├── ui/              # shadcn/ui primitives (button, badge, card, sheet, dialog, dropdown-menu, avatar, tabs, etc.)
+│   │   ├── auth/            # Auth components (sign-in-form, sign-up-form, user-menu)
 │   │   ├── catalog/         # Catalog page components (search, sort, filters, grid, pagination)
-│   │   ├── detail/          # Detail page components (breadcrumb, stats grid, price chart, related sets)
+│   │   ├── collections/     # Collection components (card, dialogs, items table)
+│   │   ├── detail/          # Detail page components (breadcrumb, stats, chart, related, add-to-collection)
 │   │   ├── landing/         # Landing page sections (hero, stats, features, etc.)
+│   │   ├── portfolio/       # Portfolio components (summary cards, breakdown table)
 │   │   ├── logo.tsx         # BrickX logo (SVG, full/icon variants)
 │   │   ├── status-badge.tsx # Set status badge (available/retired/etc.)
 │   │   ├── price-change.tsx # Price change with colored arrows
 │   │   ├── set-card.tsx     # LEGO set card with pricing
 │   │   ├── stat-card.tsx    # Stat card with label, value, delta
-│   │   ├── site-header.tsx  # Sticky nav with backdrop-blur
-│   │   ├── mobile-nav.tsx   # Sheet-based mobile navigation
+│   │   ├── site-header.tsx  # Sticky nav with UserMenu (reactive auth state)
+│   │   ├── mobile-nav.tsx   # Sheet-based mobile navigation with MobileUserMenu
 │   │   ├── site-footer.tsx  # 4-column responsive footer
 │   │   ├── page-container.tsx # max-w-7xl page wrapper
 │   │   └── theme-provider.tsx # next-themes wrapper
 │   └── lib/
+│       ├── actions/         # Server actions
+│       │   ├── auth.ts      # signOut()
+│       │   └── collections.ts # create/rename/delete collection, add/update/remove items
 │       ├── mock-data.ts     # Mock LEGO set data (CatalogSet shape, used by landing page)
 │       ├── queries/         # Server-side data access (Supabase queries)
 │       │   ├── index.ts     # Barrel export
 │       │   ├── sets.ts      # fetchCatalogSets, parseCatalogSearchParams, fetchFilterOptions
-│       │   └── set-detail.ts # fetchSetDetail, fetchPriceHistory, fetchRelatedSets
+│       │   ├── set-detail.ts # fetchSetDetail, fetchPriceHistory, fetchRelatedSets
+│       │   └── collections.ts # fetchUserCollections, fetchCollectionDetail, fetchPortfolioSummary
 │       ├── supabase/        # Supabase client modules
 │       │   ├── client.ts    # Browser client (NEXT_PUBLIC_ vars)
 │       │   ├── server.ts    # Server client (cookie-based)
-│       │   └── admin.ts     # Admin client (service role, bypasses RLS)
+│       │   ├── admin.ts     # Admin client (service role, bypasses RLS)
+│       │   └── auth.ts      # Server-side auth helpers (getUser, getUserProfile)
 │       ├── services/        # API clients and business logic
 │       │   ├── base-api-client.ts  # Generic HTTP client (retry, backoff, rate limiting)
 │       │   ├── rebrickable.ts      # Rebrickable API (catalog)
@@ -87,6 +104,7 @@ brickx/
 │       ├── types/           # TypeScript type definitions
 │       │   ├── database.ts         # Supabase Database type
 │       │   ├── catalog.ts          # CatalogSet, CatalogSearchParams, CatalogResult, PriceHistoryPoint, CatalogFilterOptions
+│       │   ├── collection.ts       # CollectionSummary, CollectionItem, CollectionWithItems, PortfolioSummary
 │       │   ├── api-common.ts       # ApiError, PaginatedResponse, BaseApiClientConfig
 │       │   ├── rebrickable.ts      # Rebrickable response types
 │       │   ├── bricklink.ts        # BrickLink response types
@@ -100,7 +118,8 @@ brickx/
 │       │   ├── oauth1.ts           # OAuth 1.0a HMAC-SHA1 signing
 │       │   └── __tests__/          # Unit tests (vitest)
 │       └── env.ts           # Zod environment validation
-└── .env.example             # Environment variable template
+│   └── middleware.ts        # Supabase SSR session refresh middleware
+└── .env.example             # Environment variable template (includes optional OAuth vars)
 ```
 
 ## Naming Conventions
@@ -114,13 +133,16 @@ brickx/
 
 ## Component Organization
 
-| Directory                 | Purpose                                          |
-| ------------------------- | ------------------------------------------------ |
-| `src/components/ui/`      | shadcn/ui primitives (auto-generated)            |
-| `src/components/`         | BrickX custom components (reusable across pages) |
-| `src/components/catalog/` | Catalog page components (search, filters, grid)  |
-| `src/components/detail/`  | Set detail page components (breadcrumb, stats, chart, related) |
-| `src/components/landing/` | Landing page sections (page-specific)            |
+| Directory                     | Purpose                                                                  |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| `src/components/ui/`          | shadcn/ui primitives (auto-generated)                                    |
+| `src/components/`             | BrickX custom components (reusable across pages)                         |
+| `src/components/auth/`        | Auth components (sign-in/up forms, user menu)                            |
+| `src/components/catalog/`     | Catalog page components (search, filters, grid)                          |
+| `src/components/collections/` | Collection components (card, CRUD dialogs, items table)                  |
+| `src/components/detail/`      | Set detail page components (breadcrumb, stats, chart, add-to-collection) |
+| `src/components/landing/`     | Landing page sections (page-specific)                                    |
+| `src/components/portfolio/`   | Portfolio components (summary cards, breakdown table)                    |
 
 **shadcn/ui config:** `components.json` at project root. Utils alias: `@/lib/utils/cn` (avoids conflict with `src/lib/utils/` directory).
 

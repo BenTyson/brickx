@@ -87,10 +87,7 @@ export function PriceChart({ data }: PriceChartProps) {
               data={data}
               margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
             >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                className="stroke-border"
-              />
+              <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis
                 dataKey="date"
                 tickFormatter={formatDate}

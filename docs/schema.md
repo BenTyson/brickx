@@ -154,4 +154,13 @@ collection_items.set_id → sets.id
 
 **Public read** (no auth required): themes, sets, set_prices, set_market_values, colors, parts, minifigs
 
-**User-scoped CRUD** (auth.uid() = user_id): users (own row), collections (own rows), collection_items (via collection ownership)
+**User-scoped CRUD** (auth.uid() = user_id): users (SELECT/INSERT/UPDATE own row), collections (full CRUD own rows), collection_items (full CRUD via collection ownership)
+
+## Triggers
+
+### handle_new_user() (migration 013)
+
+- **Fires:** AFTER INSERT on `auth.users`
+- **Action:** UPSERTS into `public.users` using `raw_user_meta_data` for name/avatar/provider
+- **Security:** SECURITY DEFINER, `SET search_path = ''`
+- **Conflict:** ON CONFLICT (id) DO UPDATE — handles re-registrations

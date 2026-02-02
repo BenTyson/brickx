@@ -9,11 +9,13 @@ import { SetDetailBreadcrumb } from "@/components/detail/set-detail-breadcrumb";
 import { MarketStatsGrid } from "@/components/detail/market-stats-grid";
 import { PriceChart } from "@/components/detail/price-chart";
 import { RelatedSets } from "@/components/detail/related-sets";
+import { AddToCollectionButton } from "@/components/detail/add-to-collection-button";
 import {
   fetchSetDetail,
   fetchPriceHistory,
   fetchRelatedSets,
 } from "@/lib/queries";
+import { createClient } from "@/lib/supabase/server";
 
 interface SetDetailPageProps {
   params: Promise<{ id: string }>;
@@ -42,6 +44,11 @@ export default async function SetDetailPage({ params }: SetDetailPageProps) {
   if (!set) {
     notFound();
   }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const [priceHistory, relatedSets] = await Promise.all([
     fetchPriceHistory(id),
@@ -85,9 +92,7 @@ export default async function SetDetailPage({ params }: SetDetailPageProps) {
               <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
                 {set.name}
               </h1>
-              <p className="text-muted-foreground mt-1 text-lg">
-                Set {set.id}
-              </p>
+              <p className="text-muted-foreground mt-1 text-lg">Set {set.id}</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -155,6 +160,12 @@ export default async function SetDetailPage({ params }: SetDetailPageProps) {
                 )}
               </div>
             )}
+
+            <AddToCollectionButton
+              setId={set.id}
+              setName={set.name}
+              userId={user?.id ?? null}
+            />
           </div>
         </div>
 

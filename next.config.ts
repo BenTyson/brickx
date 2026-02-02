@@ -8,6 +8,14 @@ const nextConfig: NextConfig = {
         hostname: "cdn.rebrickable.com",
         pathname: "/media/**",
       },
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+      },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+      },
     ],
   },
 };

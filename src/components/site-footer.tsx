@@ -9,7 +9,7 @@ const footerSections = [
       { href: "/sets", label: "Browse Sets" },
       { href: "#", label: "Trending" },
       { href: "#", label: "Price Guide" },
-      { href: "#", label: "Portfolio" },
+      { href: "/portfolio", label: "Portfolio" },
     ],
   },
   {

@@ -1,6 +1,6 @@
 # BrickX — Agent Entry Point
 
-**BrickX** is a LEGO investment platform ("StockX for LEGO") — a portfolio tracker and price guide that treats LEGO sets as an asset class. Built with Next.js 15, Supabase, and Tailwind CSS.
+**BrickX** is a LEGO investment platform ("StockX for LEGO") — a portfolio tracker and price guide that treats LEGO sets as an asset class. Built with Next.js 16, Supabase, and Tailwind CSS.
 
 ## Current Status
 
@@ -13,12 +13,12 @@
 | 3A: Data Access Layer & Primitives | **Complete** |
 | 3B: Catalog Page (`/sets`)         | **Complete** |
 | 3C: Detail Page & Price Chart      | **Complete** |
-| 4: Auth & Collection Management    | Pending      |
+| 4: Auth & Collection Management    | **Complete** |
 | 5: Market Intelligence & Deploy    | Pending      |
 
 ## What to Work on Next
 
-**Session 4** — Auth & Collection Management: Supabase Auth (Google/GitHub OAuth), user collections with CRUD, portfolio value tracking.
+**Session 5** — Market Intelligence & Deploy: Investment scoring, market trends, price alerts, and production deployment.
 
 ## Key References
 

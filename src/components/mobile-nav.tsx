@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { MobileUserMenu } from "@/components/auth/user-menu";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -16,8 +17,8 @@ import { Separator } from "@/components/ui/separator";
 
 const navLinks = [
   { href: "/sets", label: "Browse" },
-  { href: "#trending", label: "Trending" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "/collections", label: "Collections" },
+  { href: "/portfolio", label: "Portfolio" },
 ];
 
 export function MobileNav() {
@@ -60,12 +61,7 @@ export function MobileNav() {
         </nav>
         <Separator />
         <div className="flex flex-col gap-2 px-4">
-          <Button variant="outline" asChild onClick={() => setOpen(false)}>
-            <Link href="#">Sign In</Link>
-          </Button>
-          <Button asChild onClick={() => setOpen(false)}>
-            <Link href="#">Get Started</Link>
-          </Button>
+          <MobileUserMenu onNavigate={() => setOpen(false)} />
         </div>
       </SheetContent>
     </Sheet>

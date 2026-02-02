@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { MobileNav } from "@/components/mobile-nav";
+import { UserMenu } from "@/components/auth/user-menu";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils/cn";
 
 const navLinks = [
   { href: "/sets", label: "Browse" },
-  { href: "#trending", label: "Trending" },
-  { href: "#pricing", label: "Pricing" },
+  { href: "/collections", label: "Collections" },
+  { href: "/portfolio", label: "Portfolio" },
 ];
 
 export function SiteHeader({ className }: { className?: string }) {
@@ -39,12 +40,7 @@ export function SiteHeader({ className }: { className?: string }) {
 
         <div className="flex items-center gap-2">
           <div className="hidden items-center gap-2 md:flex">
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="#">Sign In</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link href="#">Get Started</Link>
-            </Button>
+            <UserMenu />
           </div>
           {/* Mobile hamburger */}
           <div className="md:hidden">
