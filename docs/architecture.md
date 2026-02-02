@@ -39,15 +39,22 @@ brickx/
 ├── src/
 │   ├── app/                 # Next.js App Router pages and routes
 │   │   ├── api/             # API route handlers
-│   │   ├── sets/            # Catalog browse page
-│   │   │   ├── page.tsx     # Server component: search, filter, sort, paginate
-│   │   │   └── loading.tsx  # Skeleton loading state
+│   │   ├── sets/            # Catalog & detail pages
+│   │   │   ├── layout.tsx   # Shared layout (SiteHeader + main + SiteFooter)
+│   │   │   ├── page.tsx     # Catalog browse: search, filter, sort, paginate
+│   │   │   ├── loading.tsx  # Catalog skeleton loading state
+│   │   │   └── [id]/        # Set detail page
+│   │   │       ├── page.tsx     # Detail: hero, market stats, price chart, related sets
+│   │   │       ├── loading.tsx  # Detail skeleton loading state
+│   │   │       └── not-found.tsx # Set-specific 404
+│   │   ├── not-found.tsx    # Global 404 page
 │   │   ├── globals.css      # BrickX design tokens (OKLCH), shadcn CSS variables
 │   │   ├── layout.tsx       # Root layout (ThemeProvider, metadata)
 │   │   └── page.tsx         # Landing page (composed from sections)
 │   ├── components/          # React components
 │   │   ├── ui/              # shadcn/ui primitives (button, badge, card, sheet, etc.)
 │   │   ├── catalog/         # Catalog page components (search, sort, filters, grid, pagination)
+│   │   ├── detail/          # Detail page components (breadcrumb, stats grid, price chart, related sets)
 │   │   ├── landing/         # Landing page sections (hero, stats, features, etc.)
 │   │   ├── logo.tsx         # BrickX logo (SVG, full/icon variants)
 │   │   ├── status-badge.tsx # Set status badge (available/retired/etc.)
@@ -112,6 +119,7 @@ brickx/
 | `src/components/ui/`      | shadcn/ui primitives (auto-generated)            |
 | `src/components/`         | BrickX custom components (reusable across pages) |
 | `src/components/catalog/` | Catalog page components (search, filters, grid)  |
+| `src/components/detail/`  | Set detail page components (breadcrumb, stats, chart, related) |
 | `src/components/landing/` | Landing page sections (page-specific)            |
 
 **shadcn/ui config:** `components.json` at project root. Utils alias: `@/lib/utils/cn` (avoids conflict with `src/lib/utils/` directory).

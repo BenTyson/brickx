@@ -4,7 +4,7 @@ import { SetCardSkeleton } from "@/components/catalog/set-card-skeleton";
 
 export default function SetsLoading() {
   return (
-    <main className="py-8">
+    <div className="py-8">
       <PageContainer>
         {/* Header */}
         <div className="mb-6">
@@ -39,6 +39,6 @@ export default function SetsLoading() {
           </div>
         </div>
       </PageContainer>
-    </main>
+    </div>
   );
 }

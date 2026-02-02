@@ -150,12 +150,34 @@
 
 **Verification:** `npx tsc --noEmit`, `npm test` (52 tests pass), `npm run lint`, `npm run format:check`
 
-## Session 3C: Detail Page & Price Chart — Pending
+## Session 3C: Detail Page & Price Chart — **Complete**
 
 **Goal:** Set detail page (`/sets/[id]`) with price chart, market stats, related sets, breadcrumb, and 404.
 **Prerequisites:** 3A + 3B
-**Deliverables:** `/sets/[id]` detail page, Recharts price chart, market stats grid, related sets section, breadcrumb, 404 page, loading skeleton
-**Verification:** `/sets/75192-1` shows detail, non-existent ID shows 404, price chart renders or shows empty state, responsive at 375px/768px/1440px
+**Deliverables:**
+
+### Page & Loading
+
+- `src/app/sets/layout.tsx` — Shared layout wrapping all `/sets/*` pages with SiteHeader + `<main>` + SiteFooter
+- `src/app/sets/[id]/page.tsx` — Server component: fetches set detail, price history, related sets in parallel. Hero with image + info panel, market stats grid, Recharts price chart, related sets. `generateMetadata` for dynamic title/description.
+- `src/app/sets/[id]/loading.tsx` — Skeleton page mirroring detail page structure
+- `src/app/sets/[id]/not-found.tsx` — Set-specific 404 with Package icon, browse/home buttons. Inherits `/sets` layout.
+- `src/app/not-found.tsx` — Global 404 with Blocks icon, own SiteHeader/SiteFooter
+
+### Detail Components (all in `src/components/detail/`)
+
+- `set-detail-breadcrumb.tsx` — Breadcrumb nav: Home > Browse Sets > {set name}. Uses shadcn breadcrumb + Next.js Link.
+- `market-stats-grid.tsx` — 8 StatCard items in responsive grid (2/3/4 cols): Market Value New/Used, 7d/30d/90d change, Annual Growth, Investment Score, MSRP. N/A for null values, colored delta indicators.
+- `price-chart.tsx` (client) — Recharts LineChart with two lines (new_avg, used_avg), custom tooltip, empty state card. XAxis as "MMM dd", YAxis as "$N".
+- `related-sets.tsx` — Up to 6 SetCards in responsive grid (1/2/3 cols)
+
+### Modified Files
+
+- `src/app/sets/page.tsx` — Changed `<main>` to `<div>` to avoid nested `<main>` with layout
+- `src/app/sets/loading.tsx` — Changed `<main>` to `<div>` to match
+- `src/components/ui/breadcrumb.tsx` — Added via `npx shadcn@latest add breadcrumb`
+
+**Verification:** `npx tsc --noEmit`, `npm test` (52 tests pass), `npm run lint`
 
 ## Session 4: Auth & Collection Management — Pending
 

@@ -44,7 +44,7 @@ export default async function SetsPage({
   );
 
   return (
-    <main className="py-8">
+    <div className="py-8">
       <PageContainer>
         {/* Header */}
         <div className="mb-6">
@@ -101,6 +101,6 @@ export default async function SetsPage({
           </div>
         </div>
       </PageContainer>
-    </main>
+    </div>
   );
 }

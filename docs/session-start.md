@@ -12,13 +12,13 @@
 | 2: Design System & Landing Page    | **Complete** |
 | 3A: Data Access Layer & Primitives | **Complete** |
 | 3B: Catalog Page (`/sets`)         | **Complete** |
-| 3C: Detail Page & Price Chart      | Pending      |
+| 3C: Detail Page & Price Chart      | **Complete** |
 | 4: Auth & Collection Management    | Pending      |
 | 5: Market Intelligence & Deploy    | Pending      |
 
 ## What to Work on Next
 
-**Session 3C** — Build set detail page (`/sets/[id]`) with price chart (Recharts), market stats, related sets, breadcrumb, and 404 page.
+**Session 4** — Auth & Collection Management: Supabase Auth (Google/GitHub OAuth), user collections with CRUD, portfolio value tracking.
 
 ## Key References
 
