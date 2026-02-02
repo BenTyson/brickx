@@ -14,3 +14,14 @@ export {
   fetchCollectionsContainingSet,
   fetchPortfolioSummary,
 } from "./collections";
+export {
+  fetchTrendingSets,
+  fetchRetiringSets,
+  fetchNewReleases,
+  fetchTopInvestments,
+} from "./market";
+export {
+  fetchUserAlerts,
+  fetchUnreadAlertCount,
+  fetchNotificationPreferences,
+} from "./alerts";

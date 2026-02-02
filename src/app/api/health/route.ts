@@ -10,6 +10,7 @@ const CATALOG_TABLES = [
   "colors",
   "parts",
   "minifigs",
+  "price_alerts",
 ] as const;
 
 export async function GET() {

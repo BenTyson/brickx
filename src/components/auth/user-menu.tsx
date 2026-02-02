@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FolderOpen, LayoutDashboard, LogOut } from "lucide-react";
+import { Bell, FolderOpen, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -95,6 +95,12 @@ export function UserMenu() {
           <Link href="/portfolio">
             <LayoutDashboard className="size-4" />
             Portfolio
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/alerts">
+            <Bell className="size-4" />
+            Alerts
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -194,6 +200,17 @@ export function MobileUserMenu({ onNavigate }: { onNavigate?: () => void }) {
         <Link href="/portfolio">
           <LayoutDashboard className="size-4" />
           Portfolio
+        </Link>
+      </Button>
+      <Button
+        variant="ghost"
+        className="justify-start"
+        asChild
+        onClick={onNavigate}
+      >
+        <Link href="/alerts">
+          <Bell className="size-4" />
+          Alerts
         </Link>
       </Button>
       <Button

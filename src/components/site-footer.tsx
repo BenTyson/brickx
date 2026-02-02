@@ -7,7 +7,7 @@ const footerSections = [
     title: "Product",
     links: [
       { href: "/sets", label: "Browse Sets" },
-      { href: "#", label: "Trending" },
+      { href: "/market/trending", label: "Trending" },
       { href: "#", label: "Price Guide" },
       { href: "/portfolio", label: "Portfolio" },
     ],

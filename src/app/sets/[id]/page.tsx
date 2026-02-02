@@ -10,12 +10,16 @@ import { MarketStatsGrid } from "@/components/detail/market-stats-grid";
 import { PriceChart } from "@/components/detail/price-chart";
 import { RelatedSets } from "@/components/detail/related-sets";
 import { AddToCollectionButton } from "@/components/detail/add-to-collection-button";
+import { CreateAlertDialog } from "@/components/alerts/create-alert-dialog";
+import { JsonLd } from "@/components/json-ld";
 import {
   fetchSetDetail,
   fetchPriceHistory,
   fetchRelatedSets,
 } from "@/lib/queries";
 import { createClient } from "@/lib/supabase/server";
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brickx.io";
 
 interface SetDetailPageProps {
   params: Promise<{ id: string }>;
@@ -55,8 +59,29 @@ export default async function SetDetailPage({ params }: SetDetailPageProps) {
     set.theme_id ? fetchRelatedSets(set.theme_id, id) : Promise.resolve([]),
   ]);
 
+  const productJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: set.name,
+    description: `LEGO ${set.name} (${set.id}). ${set.theme_name ? `Theme: ${set.theme_name}.` : ""} Year: ${set.year}. ${set.num_parts ? `${set.num_parts} parts.` : ""}`,
+    sku: set.id,
+    brand: { "@type": "Brand", name: "LEGO" },
+    ...(set.img_url && { image: set.img_url }),
+    url: `${BASE_URL}/sets/${set.id}`,
+    ...(set.market_value_new != null && {
+      offers: {
+        "@type": "AggregateOffer",
+        priceCurrency: "USD",
+        lowPrice: set.market_value_new,
+        highPrice: set.market_value_new,
+        availability: "https://schema.org/InStock",
+      },
+    }),
+  };
+
   return (
     <div className="py-8">
+      <JsonLd data={productJsonLd} />
       <PageContainer className="space-y-8">
         {/* Breadcrumb */}
         <SetDetailBreadcrumb setName={set.name} />
@@ -161,11 +186,14 @@ export default async function SetDetailPage({ params }: SetDetailPageProps) {
               </div>
             )}
 
-            <AddToCollectionButton
-              setId={set.id}
-              setName={set.name}
-              userId={user?.id ?? null}
-            />
+            <div className="flex flex-wrap gap-2">
+              <AddToCollectionButton
+                setId={set.id}
+                setName={set.name}
+                userId={user?.id ?? null}
+              />
+              {user && <CreateAlertDialog setId={set.id} setName={set.name} />}
+            </div>
           </div>
         </div>
 

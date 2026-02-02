@@ -1,5 +1,7 @@
 export type SetStatus = "available" | "retired" | "unreleased";
 export type ItemCondition = "new" | "used";
+export type AlertType = "price_drop" | "price_target" | "value_exceeded";
+export type AlertStatus = "active" | "triggered" | "dismissed";
 
 export interface Database {
   public: {
@@ -353,12 +355,109 @@ export interface Database {
           },
         ];
       };
+      price_alerts: {
+        Row: {
+          id: string;
+          user_id: string;
+          set_id: string;
+          alert_type: AlertType;
+          target_price: number | null;
+          threshold_pct: number | null;
+          is_read: boolean;
+          status: AlertStatus;
+          triggered_at: string | null;
+          triggered_value: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          set_id: string;
+          alert_type: AlertType;
+          target_price?: number | null;
+          threshold_pct?: number | null;
+          is_read?: boolean;
+          status?: AlertStatus;
+          triggered_at?: string | null;
+          triggered_value?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          set_id?: string;
+          alert_type?: AlertType;
+          target_price?: number | null;
+          threshold_pct?: number | null;
+          is_read?: boolean;
+          status?: AlertStatus;
+          triggered_at?: string | null;
+          triggered_value?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "price_alerts_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "price_alerts_set_id_fkey";
+            columns: ["set_id"];
+            isOneToOne: false;
+            referencedRelation: "sets";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      notification_preferences: {
+        Row: {
+          user_id: string;
+          email_alerts: boolean;
+          price_drop_alerts: boolean;
+          value_exceeded_alerts: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          email_alerts?: boolean;
+          price_drop_alerts?: boolean;
+          value_exceeded_alerts?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          email_alerts?: boolean;
+          price_drop_alerts?: boolean;
+          value_exceeded_alerts?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "notification_preferences_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: true;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
     Enums: {
       set_status: SetStatus;
       item_condition: ItemCondition;
+      alert_type: AlertType;
+      alert_status: AlertStatus;
     };
   };
 }
