@@ -21,13 +21,13 @@ export function FeaturedSetsSection() {
 
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {featured.map((set) => (
-            <SetCard key={set.setNumber} {...set} />
+            <SetCard key={set.id} set={set} />
           ))}
         </div>
 
         <div className="mt-10 text-center">
           <Button variant="outline" size="lg" asChild>
-            <Link href="#">Browse All Sets</Link>
+            <Link href="/sets">Browse All Sets</Link>
           </Button>
         </div>
       </PageContainer>

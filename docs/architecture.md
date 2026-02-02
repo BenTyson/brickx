@@ -10,6 +10,7 @@
 | Theming   | next-themes (dark-first, class strategy)   |
 | Database  | Supabase (PostgreSQL)                      |
 | Auth      | Supabase Auth (Google/GitHub OAuth)        |
+| Charting  | recharts (React chart library)             |
 | Dev Port  | 5699                                       |
 | Testing   | vitest (globals, node environment)         |
 | Scripts   | tsx (for standalone scripts in `scripts/`) |
@@ -38,11 +39,15 @@ brickx/
 ├── src/
 │   ├── app/                 # Next.js App Router pages and routes
 │   │   ├── api/             # API route handlers
+│   │   ├── sets/            # Catalog browse page
+│   │   │   ├── page.tsx     # Server component: search, filter, sort, paginate
+│   │   │   └── loading.tsx  # Skeleton loading state
 │   │   ├── globals.css      # BrickX design tokens (OKLCH), shadcn CSS variables
 │   │   ├── layout.tsx       # Root layout (ThemeProvider, metadata)
 │   │   └── page.tsx         # Landing page (composed from sections)
 │   ├── components/          # React components
 │   │   ├── ui/              # shadcn/ui primitives (button, badge, card, sheet, etc.)
+│   │   ├── catalog/         # Catalog page components (search, sort, filters, grid, pagination)
 │   │   ├── landing/         # Landing page sections (hero, stats, features, etc.)
 │   │   ├── logo.tsx         # BrickX logo (SVG, full/icon variants)
 │   │   ├── status-badge.tsx # Set status badge (available/retired/etc.)
@@ -55,7 +60,11 @@ brickx/
 │   │   ├── page-container.tsx # max-w-7xl page wrapper
 │   │   └── theme-provider.tsx # next-themes wrapper
 │   └── lib/
-│       ├── mock-data.ts     # Temporary mock LEGO set data (replaced by DB in Session 3)
+│       ├── mock-data.ts     # Mock LEGO set data (CatalogSet shape, used by landing page)
+│       ├── queries/         # Server-side data access (Supabase queries)
+│       │   ├── index.ts     # Barrel export
+│       │   ├── sets.ts      # fetchCatalogSets, parseCatalogSearchParams, fetchFilterOptions
+│       │   └── set-detail.ts # fetchSetDetail, fetchPriceHistory, fetchRelatedSets
 │       ├── supabase/        # Supabase client modules
 │       │   ├── client.ts    # Browser client (NEXT_PUBLIC_ vars)
 │       │   ├── server.ts    # Server client (cookie-based)
@@ -70,6 +79,7 @@ brickx/
 │       │   └── __tests__/          # Service unit tests (vitest)
 │       ├── types/           # TypeScript type definitions
 │       │   ├── database.ts         # Supabase Database type
+│       │   ├── catalog.ts          # CatalogSet, CatalogSearchParams, CatalogResult, PriceHistoryPoint, CatalogFilterOptions
 │       │   ├── api-common.ts       # ApiError, PaginatedResponse, BaseApiClientConfig
 │       │   ├── rebrickable.ts      # Rebrickable response types
 │       │   ├── bricklink.ts        # BrickLink response types
@@ -97,11 +107,12 @@ brickx/
 
 ## Component Organization
 
-| Directory                 | Purpose                               |
-| ------------------------- | ------------------------------------- |
-| `src/components/ui/`      | shadcn/ui primitives (auto-generated) |
-| `src/components/`         | BrickX custom components (reusable)   |
-| `src/components/landing/` | Landing page sections (page-specific) |
+| Directory                 | Purpose                                          |
+| ------------------------- | ------------------------------------------------ |
+| `src/components/ui/`      | shadcn/ui primitives (auto-generated)            |
+| `src/components/`         | BrickX custom components (reusable across pages) |
+| `src/components/catalog/` | Catalog page components (search, filters, grid)  |
+| `src/components/landing/` | Landing page sections (page-specific)            |
 
 **shadcn/ui config:** `components.json` at project root. Utils alias: `@/lib/utils/cn` (avoids conflict with `src/lib/utils/` directory).
 

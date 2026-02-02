@@ -4,19 +4,21 @@
 
 ## Current Status
 
-| Session                           | Status       |
-| --------------------------------- | ------------ |
-| 1A: Project Setup & DB Schema     | **Complete** |
-| 1B: Infrastructure & API Services | **Complete** |
-| 1C: Data Seeding & Aggregation    | **Complete** |
-| 2: Design System & Landing Page   | **Complete** |
-| 3: Catalog, Search & Detail Pages | Pending      |
-| 4: Auth & Collection Management   | Pending      |
-| 5: Market Intelligence & Deploy   | Pending      |
+| Session                            | Status       |
+| ---------------------------------- | ------------ |
+| 1A: Project Setup & DB Schema      | **Complete** |
+| 1B: Infrastructure & API Services  | **Complete** |
+| 1C: Data Seeding & Aggregation     | **Complete** |
+| 2: Design System & Landing Page    | **Complete** |
+| 3A: Data Access Layer & Primitives | **Complete** |
+| 3B: Catalog Page (`/sets`)         | **Complete** |
+| 3C: Detail Page & Price Chart      | Pending      |
+| 4: Auth & Collection Management    | Pending      |
+| 5: Market Intelligence & Deploy    | Pending      |
 
 ## What to Work on Next
 
-**Session 3** — Build browsable set catalog with search, filtering, sorting, and detailed set pages with pricing charts.
+**Session 3C** — Build set detail page (`/sets/[id]`) with price chart (Recharts), market stats, related sets, breadcrumb, and 404 page.
 
 ## Key References
 

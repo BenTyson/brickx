@@ -101,12 +101,61 @@
 **Accessibility:** Skip-to-content link, proper heading hierarchy (single h1, h2 per section, h3 for sub-items), ARIA labels on nav/logo/icon buttons, 44px+ touch targets, high contrast ratios (foreground on background: 19.4:1)
 **Verification:** `npx tsc --noEmit`, `npm test` (52 tests pass), `npm run lint`, `npm run format:check`, visual review at 375px/768px/1440px
 
-## Session 3: Catalog, Search & Detail Pages — Pending
+## Session 3A: Data Access Layer & Primitives — **Complete**
 
-**Goal:** Browsable set catalog with search, filtering, sorting, and detailed set pages with pricing charts.
+**Goal:** Install charting dependency (recharts), add shadcn UI primitives, create typed data access layer for catalog and detail queries.
 **Prerequisites:** 1C + 2
-**Deliverables:** `/sets` catalog page, `/sets/[id]` detail page, search component, filter sidebar, price chart
-**Verification:** Search returns results, filters work, set detail shows price history
+**Deliverables:**
+
+- `recharts` npm dependency
+- shadcn/ui components: input, select, skeleton, slider, checkbox, label, scroll-area, pagination, accordion
+- `src/lib/types/catalog.ts` — `CatalogSet`, `CatalogSearchParams`, `CatalogSortField`, `CatalogResult`, `PriceHistoryPoint`, `CatalogFilterOptions`
+- `src/lib/queries/sets.ts` — `fetchCatalogSets()` (Supabase joins + filters + sort + offset pagination, page size 24), `parseCatalogSearchParams()`, `fetchFilterOptions()`
+- `src/lib/queries/set-detail.ts` — `fetchSetDetail()`, `fetchPriceHistory()`, `fetchRelatedSets()`
+- `src/lib/queries/index.ts` — Barrel export
+
+**Verification:** `npx tsc --noEmit`, `npm test` (52 tests pass), `npm run lint`, `npm run format:check`
+
+## Session 3B: Catalog Page (`/sets`) — **Complete**
+
+**Goal:** Full catalog browse page with search, filters, sorting, pagination — all state in URL params.
+**Prerequisites:** 3A
+**Deliverables:**
+
+### Page & Loading
+
+- `src/app/sets/page.tsx` — Server component: reads `searchParams` (Promise), fetches data in parallel, renders sidebar + grid layout. Metadata: "Browse LEGO Sets | BrickX"
+- `src/app/sets/loading.tsx` — Skeleton page with 24 card placeholders
+
+### Catalog Components (all in `src/components/catalog/`)
+
+- `catalog-search.tsx` (client) — Debounced (300ms) search input, uncontrolled with key-based URL sync
+- `catalog-sort.tsx` (client) — Select dropdown with 12 sort options (field + direction)
+- `catalog-filters.tsx` (client) — Sidebar: theme checkboxes (top 20) in ScrollArea, year range inputs, status checkboxes with counts, MSRP price range inputs. All in Accordion. Clear all button.
+- `mobile-filter-sheet.tsx` (client) — Sheet slide-from-left wrapping CatalogFilters, filter count badge
+- `catalog-grid.tsx` — Responsive grid (`sm:grid-cols-2 lg:grid-cols-3`), empty state with Package icon + clear filters CTA
+- `catalog-pagination.tsx` (client) — Pagination with ellipsis truncation, "Showing X–Y of Z sets" text
+- `active-filters.tsx` (client) — Dismissible Badge pills for active filters above grid
+- `set-card-skeleton.tsx` — Skeleton matching SetCard dimensions
+
+### Modified Files
+
+- `src/components/set-card.tsx` — Refactored from individual string props to `{ set: CatalogSet }`. Renders `img_url` via `next/image` with Package icon fallback. Handles nullable fields. Wrapped in `<Link href={/sets/${set.id}}>`.
+- `src/lib/mock-data.ts` — Updated from `MockSet` to `CatalogSet` shape
+- `src/components/landing/featured-sets-section.tsx` — Updated to new SetCard API, "Browse All Sets" links to `/sets`
+- `src/components/site-header.tsx` — `#browse` → `/sets`
+- `src/components/mobile-nav.tsx` — `#browse` → `/sets`
+- `src/components/site-footer.tsx` — "Browse Sets" href → `/sets`
+- `next.config.ts` — Added `images.remotePatterns` for `cdn.rebrickable.com/media/**`
+
+**Verification:** `npx tsc --noEmit`, `npm test` (52 tests pass), `npm run lint`, `npm run format:check`
+
+## Session 3C: Detail Page & Price Chart — Pending
+
+**Goal:** Set detail page (`/sets/[id]`) with price chart, market stats, related sets, breadcrumb, and 404.
+**Prerequisites:** 3A + 3B
+**Deliverables:** `/sets/[id]` detail page, Recharts price chart, market stats grid, related sets section, breadcrumb, 404 page, loading skeleton
+**Verification:** `/sets/75192-1` shows detail, non-existent ID shows 404, price chart renders or shows empty state, responsive at 375px/768px/1440px
 
 ## Session 4: Auth & Collection Management — Pending
 
