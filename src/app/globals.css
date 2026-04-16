@@ -1,103 +1,172 @@
 @import "tailwindcss";
 
 /* ───────────────────────────────────────────────────────
-   BrickX Design Tokens — Dark-first color system
-   Using OKLCH for perceptual uniformity where possible,
-   hex fallbacks for brand colors.
+   BrickX Design Tokens — Dark-first, cobalt accent
+   North star: Robinhood × StockX × Vercel.
+   One brand accent (cobalt #3B82F6). Mono base + green/red only.
    ─────────────────────────────────────────────────────── */
 
-/* Light mode */
-:root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.546 0.245 262.881);
-  --primary-foreground: oklch(0.985 0.002 247.858);
-  --secondary: oklch(0.926 0.006 264.531);
-  --secondary-foreground: oklch(0.205 0.01 285.823);
-  --muted: oklch(0.926 0.006 264.531);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.926 0.006 264.531);
-  --accent-foreground: oklch(0.205 0.01 285.823);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.87 0.006 264.531);
-  --input: oklch(0.87 0.006 264.531);
-  --ring: oklch(0.546 0.245 262.881);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.649 0.2 136.071);
-  --chart-5: oklch(0.769 0.188 70.08);
+/* Dark mode (default, brand surface) */
+:root,
+.dark {
+  /* Elevation triad — warm black (microscopic red/violet tint for leather feel) */
+  --bg-base: #0b0a0c;
+  --bg-raised: #161418;
+  --bg-overlay: #1e1b22;
+
+  /* Text opacity tiers (on dark) — 100 / 70 / 50 / 30 */
+  --text-primary: rgba(255, 255, 255, 1);
+  --text-secondary: rgba(255, 255, 255, 0.72);
+  --text-tertiary: rgba(255, 255, 255, 0.48);
+  --text-quaternary: rgba(255, 255, 255, 0.28);
+
+  /* Borders — hairline only; used sparingly */
+  --border-thin: rgba(255, 255, 255, 0.05);
+  --border-emphasis: rgba(255, 255, 255, 0.09);
+
+  /* Brand accent — electric ultramarine (specified, not defaulted) */
+  --accent: #4c6fff;
+  --accent-hover: #6c88ff;
+  --accent-pressed: #3a5ce8;
+  --accent-foreground: #ffffff;
+
+  /* Semantic signal — green gain / red loss only */
+  --success: #22c55e;
+  --success-foreground: #ffffff;
+  --danger: #ef4444;
+  --danger-foreground: #ffffff;
+  --warning: #f59e0b;
+  --warning-foreground: #0a0a0b;
+  --info: #8b5cf6;
+  --info-foreground: #ffffff;
+
+  /* Shadcn-compatible aliases mapped to cobalt system */
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --card: var(--bg-raised);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-overlay);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-foreground);
+  --secondary: var(--bg-overlay);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--bg-raised);
+  --muted-foreground: var(--text-tertiary);
+  --accent-bg: var(--bg-overlay);
+  --accent-bg-foreground: var(--text-primary);
+  --destructive: var(--danger);
+  --border: var(--border-thin);
+  --input: var(--border-emphasis);
+  --ring: var(--accent);
+
+  /* Chart palette — cobalt primary, mono secondaries */
+  --chart-1: var(--accent);
+  --chart-2: var(--success);
+  --chart-3: var(--warning);
+  --chart-4: var(--info);
+  --chart-5: var(--danger);
+
+  /* Sidebar */
+  --sidebar: var(--bg-raised);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-foreground);
+  --sidebar-accent: var(--bg-overlay);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--border-thin);
+  --sidebar-ring: var(--accent);
+
   --radius: 0.625rem;
-  --sidebar: oklch(0.97 0.001 286.375);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.205 0.01 285.823);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.926 0.006 264.531);
-  --sidebar-accent-foreground: oklch(0.205 0.01 285.823);
-  --sidebar-border: oklch(0.87 0.006 264.531);
-  --sidebar-ring: oklch(0.546 0.245 262.881);
-  /* BrickX custom tokens */
-  --success: oklch(0.627 0.194 149.214);
-  --success-foreground: oklch(0.985 0 0);
-  --warning: oklch(0.681 0.162 75.834);
-  --warning-foreground: oklch(0.141 0.005 285.823);
-  --info: oklch(0.541 0.281 293.009);
-  --info-foreground: oklch(0.985 0 0);
 }
 
-/* Dark mode (default for BrickX) */
-.dark {
-  --background: oklch(0.105 0.005 285.823);
-  --foreground: oklch(0.985 0.002 247.858);
-  --card: oklch(0.155 0.005 285.823);
-  --card-foreground: oklch(0.985 0.002 247.858);
-  --popover: oklch(0.175 0.005 285.823);
-  --popover-foreground: oklch(0.985 0.002 247.858);
-  --primary: oklch(0.623 0.214 259.815);
-  --primary-foreground: oklch(0.985 0.002 247.858);
-  --secondary: oklch(0.215 0.006 285.885);
-  --secondary-foreground: oklch(0.985 0.002 247.858);
-  --muted: oklch(0.215 0.006 285.885);
-  --muted-foreground: oklch(0.63 0.015 285.823);
-  --accent: oklch(0.215 0.006 285.885);
-  --accent-foreground: oklch(0.985 0.002 247.858);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.24 0.006 285.885);
-  --input: oklch(0.24 0.006 285.885);
-  --ring: oklch(0.623 0.214 259.815);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.13 0.005 285.823);
-  --sidebar-foreground: oklch(0.985 0.002 247.858);
-  --sidebar-primary: oklch(0.623 0.214 259.815);
-  --sidebar-primary-foreground: oklch(0.985 0.002 247.858);
-  --sidebar-accent: oklch(0.215 0.006 285.885);
-  --sidebar-accent-foreground: oklch(0.985 0.002 247.858);
-  --sidebar-border: oklch(0.24 0.006 285.885);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
-  /* BrickX custom tokens */
-  --success: oklch(0.627 0.194 149.214);
-  --success-foreground: oklch(0.985 0 0);
-  --warning: oklch(0.681 0.162 75.834);
-  --warning-foreground: oklch(0.141 0.005 285.823);
-  --info: oklch(0.541 0.281 293.009);
-  --info-foreground: oklch(0.985 0 0);
+/* Light mode — kept minimal; brand surface is dark-first */
+:root:not(.dark) {
+  --bg-base: #fbfaf8; /* Warm paper white */
+  --bg-raised: #f4f2ee;
+  --bg-overlay: #ebe8e2;
+
+  --text-primary: rgba(16, 14, 18, 1);
+  --text-secondary: rgba(16, 14, 18, 0.72);
+  --text-tertiary: rgba(16, 14, 18, 0.48);
+  --text-quaternary: rgba(16, 14, 18, 0.28);
+
+  --border-thin: rgba(16, 14, 18, 0.07);
+  --border-emphasis: rgba(16, 14, 18, 0.12);
+
+  --accent: #3a5ce8;
+  --accent-hover: #4c6fff;
+  --accent-pressed: #2a46c4;
+  --accent-foreground: #ffffff;
+
+  --success: #16a34a;
+  --success-foreground: #ffffff;
+  --danger: #dc2626;
+  --danger-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+  --info: #7c3aed;
+  --info-foreground: #ffffff;
+
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --card: var(--bg-raised);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-base);
+  --popover-foreground: var(--text-primary);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-foreground);
+  --secondary: var(--bg-overlay);
+  --secondary-foreground: var(--text-primary);
+  --muted: var(--bg-raised);
+  --muted-foreground: var(--text-tertiary);
+  --accent-bg: var(--bg-overlay);
+  --accent-bg-foreground: var(--text-primary);
+  --destructive: var(--danger);
+  --border: var(--border-thin);
+  --input: var(--border-emphasis);
+  --ring: var(--accent);
+
+  --chart-1: var(--accent);
+  --chart-2: var(--success);
+  --chart-3: var(--warning);
+  --chart-4: var(--info);
+  --chart-5: var(--danger);
+
+  --sidebar: var(--bg-raised);
+  --sidebar-foreground: var(--text-primary);
+  --sidebar-primary: var(--accent);
+  --sidebar-primary-foreground: var(--accent-foreground);
+  --sidebar-accent: var(--bg-overlay);
+  --sidebar-accent-foreground: var(--text-primary);
+  --sidebar-border: var(--border-thin);
+  --sidebar-ring: var(--accent);
 }
 
 /* ───────────────────────────────────────────────────────
    Tailwind v4 Theme Registration
+   Exposes tokens as Tailwind utilities.
    ─────────────────────────────────────────────────────── */
 
 @theme inline {
+  /* Surface tokens */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-bg-base: var(--bg-base);
+  --color-bg-raised: var(--bg-raised);
+  --color-bg-overlay: var(--bg-overlay);
+
+  /* Text tiers */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
+  --color-text-quaternary: var(--text-quaternary);
+
+  /* Borders */
+  --color-border-thin: var(--border-thin);
+  --color-border-emphasis: var(--border-emphasis);
+
+  /* Shadcn aliases */
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -110,15 +179,31 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-pressed: var(--accent-pressed);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Semantic */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-danger: var(--danger);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* Chart series */
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+
+  /* Sidebar */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -127,21 +212,69 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-  /* BrickX custom tokens */
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
-  --color-info: var(--info);
-  --color-info-foreground: var(--info-foreground);
+
+  /* Radius */
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Font families — Geist sans/mono for UI, Instrument Serif for editorial moments */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-serif:
+    var(--font-instrument-serif), "Times New Roman", Georgia, ui-serif, serif;
+
+  /* Type scale — display / h1 / h2 / h3 / body / small / micro.
+     Display sizes are intended for serif (Instrument Serif) use via .text-display-serif. */
+  --text-display: 7.5rem; /* 120px */
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.035em;
+  --text-display--font-weight: 500;
+
+  --text-display-sm: 6rem; /* 96px */
+  --text-display-sm--line-height: 0.98;
+  --text-display-sm--letter-spacing: -0.03em;
+  --text-display-sm--font-weight: 500;
+
+  --text-h1: 3.5rem; /* 56px */
+  --text-h1--line-height: 1.05;
+  --text-h1--letter-spacing: -0.025em;
+  --text-h1--font-weight: 500;
+
+  --text-h2: 2.5rem; /* 40px */
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.025em;
+  --text-h2--font-weight: 600;
+
+  --text-h3: 1.75rem; /* 28px */
+  --text-h3--line-height: 1.2;
+  --text-h3--letter-spacing: -0.02em;
+  --text-h3--font-weight: 600;
+
+  --text-body: 0.9375rem; /* 15px */
+  --text-body--line-height: 1.55;
+  --text-body--letter-spacing: -0.005em;
+
+  --text-small: 0.8125rem; /* 13px */
+  --text-small--line-height: 1.45;
+
+  --text-micro: 0.6875rem; /* 11px */
+  --text-micro--line-height: 1.35;
+  --text-micro--letter-spacing: 0.02em;
+
+  /* Motion timing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-pulse-slow: pulse-slow 2.4s var(--ease-out-quart) infinite;
+  --animate-shimmer: shimmer 1.8s linear infinite;
 }
 
 @keyframes accordion-down {
@@ -162,6 +295,25 @@
   }
 }
 
+@keyframes pulse-slow {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 /* ───────────────────────────────────────────────────────
    Global Styles
    ─────────────────────────────────────────────────────── */
@@ -173,38 +325,200 @@ html {
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings:
+    "ss01" on,
+    "ss04" on,
+    "cv11" on;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* Custom scrollbar */
+/* Tabular lining figures — apply to any numeric UI */
+.font-tabular,
+.tabular-nums {
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings:
+    "tnum" on,
+    "lnum" on,
+    "zero" on;
+}
+
+/* Type scale utility classes (complement Tailwind's text-*) */
+.text-display {
+  font-size: var(--text-display);
+  line-height: var(--text-display--line-height);
+  letter-spacing: var(--text-display--letter-spacing);
+  font-weight: var(--text-display--font-weight);
+}
+.text-display-sm {
+  font-size: var(--text-display-sm);
+  line-height: var(--text-display-sm--line-height);
+  letter-spacing: var(--text-display-sm--letter-spacing);
+  font-weight: var(--text-display-sm--font-weight);
+}
+
+/* Serif display — editorial moments (hero headlines, pull-quotes, section leads).
+   Pairs with .text-display-* sizes; apply both.
+   Example: <h1 class="text-display font-serif-display">LEGO as an asset class.</h1> */
+.font-serif-display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.022em;
+  /* Serif at display size wants slightly looser leading */
+  line-height: 1;
+}
+.font-serif-display.italic,
+.font-serif-display em {
+  font-style: italic;
+}
+.text-h1 {
+  font-size: var(--text-h1);
+  line-height: var(--text-h1--line-height);
+  letter-spacing: var(--text-h1--letter-spacing);
+  font-weight: var(--text-h1--font-weight);
+}
+.text-h2 {
+  font-size: var(--text-h2);
+  line-height: var(--text-h2--line-height);
+  letter-spacing: var(--text-h2--letter-spacing);
+  font-weight: var(--text-h2--font-weight);
+}
+.text-h3 {
+  font-size: var(--text-h3);
+  line-height: var(--text-h3--line-height);
+  letter-spacing: var(--text-h3--letter-spacing);
+  font-weight: var(--text-h3--font-weight);
+}
+.text-body {
+  font-size: var(--text-body);
+  line-height: var(--text-body--line-height);
+  letter-spacing: var(--text-body--letter-spacing);
+}
+.text-small {
+  font-size: var(--text-small);
+  line-height: var(--text-small--line-height);
+}
+.text-micro {
+  font-size: var(--text-micro);
+  line-height: var(--text-micro--line-height);
+  letter-spacing: var(--text-micro--letter-spacing);
+  text-transform: uppercase;
+}
+
+/* Custom scrollbar (desktop) */
 @media (pointer: fine) {
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-
   ::-webkit-scrollbar-track {
     background: transparent;
   }
-
   ::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: var(--border-emphasis);
     border-radius: 4px;
   }
-
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--muted-foreground);
+    background: var(--text-tertiary);
   }
 }
 
-/* Selection color */
+/* Selection */
 ::selection {
-  background: oklch(0.623 0.214 259.815 / 0.3);
-  color: var(--foreground);
+  background: color-mix(in oklab, var(--accent) 35%, transparent);
+  color: var(--text-primary);
 }
 
 /* Focus ring utility */
 .focus-ring {
-  outline: 2px solid var(--ring);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* ───────────────────────────────────────────────────────
+   Surface & Texture Utilities
+   ─────────────────────────────────────────────────────── */
+
+/* Noise texture — SVG filter, layered over gradients for film-grain feel.
+   Apply as overlay: <div class="bg-noise" /> on a positioned element, or
+   compose via ::before. */
+.bg-noise {
+  position: relative;
+  isolation: isolate;
+}
+.bg-noise::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* Radial spotlight — cobalt-tinted glow from top */
+.bg-spotlight {
+  background:
+    radial-gradient(
+      ellipse 80% 60% at 50% -10%,
+      color-mix(in oklab, var(--accent) 22%, transparent),
+      transparent 70%
+    ),
+    var(--bg-base);
+}
+
+/* Radial from cursor — use with CSS vars --mx / --my (0-100%) updated via JS */
+.bg-cursor-spotlight {
+  background: radial-gradient(
+    600px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in oklab, var(--accent) 14%, transparent),
+    transparent 40%
+  );
+}
+
+/* Conic brand shimmer — use on small accent chips */
+.bg-conic-brand {
+  background: conic-gradient(
+    from 140deg at 50% 50%,
+    var(--accent) 0deg,
+    var(--accent-hover) 90deg,
+    var(--accent-pressed) 180deg,
+    var(--accent) 360deg
+  );
+}
+
+/* Linear brand gradient — hero CTA */
+.bg-brand-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    var(--accent-hover) 100%
+  );
+}
+
+/* Hairline divider — inline emphasis border */
+.divide-hairline > * + * {
+  border-top: 1px solid var(--border-thin);
+}
+
+/* Glow — cobalt drop-shadow for active states */
+.glow-accent {
+  box-shadow:
+    0 0 0 1px var(--border-emphasis),
+    0 0 32px -8px color-mix(in oklab, var(--accent) 60%, transparent);
+}
+
+/* Shimmer skeleton — use as loading block bg */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-raised) 0%,
+    var(--bg-overlay) 50%,
+    var(--bg-raised) 100%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
 }
