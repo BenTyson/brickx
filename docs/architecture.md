@@ -189,6 +189,8 @@ brickx/
 - Validated at startup via `src/lib/env.ts` using Zod
 - Template in `.env.example`, actual values in `.env.local` (gitignored)
 
+**Worktree note:** `.env.local` is gitignored, so fresh worktrees under `.claude/worktrees/` don't have it — middleware will crash on first request. Copy or symlink from the main repo on first use: `cp /Users/bentyson/brickx/.env.local .env.local` (or `ln -s` for auto-sync across worktrees). See `docs/session-start.md` § Worktree Preflight for the full session startup procedure.
+
 ## Script Execution
 
 All standalone scripts use `tsx` and are run from project root:

@@ -2,6 +2,32 @@
 
 **BrickX** is a LEGO investment platform ("StockX for LEGO") — a portfolio tracker and price guide that treats LEGO sets as an asset class. Built with Next.js 16, Supabase, and Tailwind CSS.
 
+## Worktree Preflight — READ FIRST
+
+Every agent session spawns into its **own git worktree** under `/Users/bentyson/brickx/.claude/worktrees/<name>/` on branch `claude/<name>`. Worktrees are isolated — they do NOT auto-inherit commits from prior sessions. Before doing anything, run:
+
+```bash
+pwd && git log --oneline -5 && ls .env.local 2>&1
+```
+
+Check three things:
+
+1. **You're in a worktree, not the main repo.** `pwd` should be under `.claude/worktrees/...`.
+2. **Prior session commits are present.** If your session depends on a prior one (e.g. D2 depends on D1, F2 depends on F1), look for that commit in `git log`. If missing:
+   ```bash
+   git branch -a                              # find the branch with the prior work
+   git merge --ff-only claude/<prior-branch>  # fast-forward it in
+   ```
+   The plan file `/Users/bentyson/.claude/plans/nifty-nibbling-jellyfish.md` is the authority on session dependencies.
+3. **`.env.local` exists.** It's gitignored, so fresh worktrees don't have it. Middleware will crash on first request without it:
+   ```bash
+   cp /Users/bentyson/brickx/.env.local .env.local   # or symlink
+   ```
+
+**Dev server gotcha:** Port 5699 can only host one Next.js dev server. If the user has `npm run dev` running from the main repo or another worktree, routes added in *this* worktree will 404. Check with `lsof -i :5699` and restart from this worktree if needed.
+
+**At session end:** commit on the current `claude/<name>` branch. The user merges branches forward between sessions; do not push or merge to `main` unless asked.
+
 ## Current Status
 
 | Session                            | Status       |
