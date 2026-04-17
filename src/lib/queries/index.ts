@@ -13,6 +13,9 @@ export {
   fetchCollectionDetail,
   fetchCollectionsContainingSet,
   fetchPortfolioSummary,
+  fetchPortfolioHistory,
+  fetchThemeAttribution,
+  fetchTopMovers,
 } from "./collections";
 export {
   fetchTrendingSets,

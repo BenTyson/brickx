@@ -34,6 +34,36 @@ export interface CollectionWithItems {
   items: CollectionItem[];
 }
 
+export type PortfolioHistoryRange = "1W" | "1M" | "3M" | "1Y" | "ALL";
+
+export interface PortfolioHistoryPoint {
+  date: string;
+  total_value: number;
+  cost_basis: number;
+  item_count: number;
+}
+
+export interface PortfolioHistory {
+  range: PortfolioHistoryRange;
+  points: PortfolioHistoryPoint[];
+}
+
+export interface ThemeAttribution {
+  theme: string;
+  start_value: number;
+  end_value: number;
+  gain: number;
+}
+
+export interface CollectionMover {
+  set_id: string;
+  set_name: string;
+  set_img_url: string | null;
+  theme_name: string | null;
+  market_value: number;
+  pct_change_30d: number | null;
+}
+
 export interface PortfolioSummary {
   total_value: number;
   total_cost: number;

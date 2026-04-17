@@ -415,6 +415,50 @@ export interface Database {
           },
         ];
       };
+      portfolio_snapshots: {
+        Row: {
+          id: string;
+          user_id: string;
+          snapshot_date: string;
+          total_value: number;
+          cost_basis: number;
+          item_count: number;
+          by_theme_json: Record<string, number>;
+          by_condition_json: Record<string, number>;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          snapshot_date: string;
+          total_value?: number;
+          cost_basis?: number;
+          item_count?: number;
+          by_theme_json?: Record<string, number>;
+          by_condition_json?: Record<string, number>;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          snapshot_date?: string;
+          total_value?: number;
+          cost_basis?: number;
+          item_count?: number;
+          by_theme_json?: Record<string, number>;
+          by_condition_json?: Record<string, number>;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "portfolio_snapshots_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       notification_preferences: {
         Row: {
           user_id: string;

@@ -3,9 +3,17 @@ import Link from "next/link";
 import { BarChart3 } from "lucide-react";
 import { PageContainer } from "@/components/page-container";
 import { Button } from "@/components/ui/button";
-import { fetchPortfolioSummary } from "@/lib/queries";
+import {
+  fetchPortfolioSummary,
+  fetchPortfolioHistory,
+  fetchThemeAttribution,
+  fetchTopMovers,
+} from "@/lib/queries";
 import { PortfolioSummaryCards } from "@/components/portfolio/portfolio-summary-cards";
 import { CollectionsBreakdownTable } from "@/components/portfolio/collections-breakdown-table";
+import { PortfolioHistoryChart } from "@/components/portfolio/portfolio-history-chart";
+import { TopMoversCard } from "@/components/portfolio/top-movers-card";
+import { ThemeAttributionCard } from "@/components/portfolio/theme-attribution-card";
 
 export const metadata: Metadata = {
   title: "Portfolio | BrickX",
@@ -15,6 +23,12 @@ export const metadata: Metadata = {
 
 export default async function PortfolioPage() {
   const summary = await fetchPortfolioSummary();
+
+  const [history, attribution, movers] = await Promise.all([
+    fetchPortfolioHistory("1M"),
+    fetchThemeAttribution("1M"),
+    fetchTopMovers(5),
+  ]);
 
   if (summary.total_sets === 0) {
     return (
@@ -49,6 +63,11 @@ export default async function PortfolioPage() {
       </div>
 
       <PortfolioSummaryCards summary={summary} />
+      <PortfolioHistoryChart initial={history} />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <ThemeAttributionCard attribution={attribution} range="1M" />
+        <TopMoversCard gainers={movers.gainers} losers={movers.losers} />
+      </div>
       <CollectionsBreakdownTable collections={summary.collections} />
     </PageContainer>
   );
