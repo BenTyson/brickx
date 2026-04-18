@@ -83,7 +83,7 @@ export function DemoCommandPaletteProvider({ children }: { children: ReactNode }
       title: s.name,
       subtitle: `${s.id} · ${s.theme} · ${s.year}`,
       group: "Sets",
-      href: `/demo/sets#set-${s.id}`,
+      href: `/demo/sets/${s.id}`,
       keywords: [s.id, s.theme, String(s.year)],
     }));
 

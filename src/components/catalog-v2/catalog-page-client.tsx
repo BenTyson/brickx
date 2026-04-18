@@ -137,7 +137,7 @@ export function CatalogPageClient({ onOpenPalette }: CatalogPageClientProps) {
                   currentValue={s.currentValue}
                   pctChange={s.pctChange30d}
                   sparkline={sparklineForSet(s, 45)}
-                  href={`#set-${s.id}`}
+                  href={`/demo/sets/${s.id}`}
                 />
               ))}
             </div>

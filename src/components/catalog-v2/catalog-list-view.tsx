@@ -25,7 +25,7 @@ const STATUS_LABEL: Record<CatalogSet["status"], string> = {
 
 export function CatalogListView({
   sets,
-  hrefForId = (id) => `#set-${id}`,
+  hrefForId = (id) => `/demo/sets/${id}`,
 }: CatalogListViewProps) {
   const columns = useMemo<DataTableColumn<CatalogSet>[]>(
     () => [
