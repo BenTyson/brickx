@@ -339,3 +339,55 @@
 - `src/lib/types/database.ts` — Added `users.onboarded_at`; added `import_history` table type with full Row/Insert/Update/Relationships
 
 **Verification:** `npm run build` (exit 0), `npm test` (52/52 pass)
+
+## Session D6: Portfolio + Collections dashboard — **Complete**
+
+**Goal:** `/demo/portfolio`, `/demo/collections/[id]` — Robinhood-grade portfolio dashboard with real chart primitives.
+**Prerequisites:** D1 + D2 (motion + UI primitives), F2 (portfolio_snapshots schema in place)
+**Model:** Opus 4.7
+
+**Deliverables:**
+
+- `src/lib/mock/portfolio.ts` — Mock data: `HOLDINGS`, `portfolioSnapshot()`, `themeAllocations()`, `topMovers()`, `WISHLIST`, `riskReturnSeries()`, `portfolioHistory()`. Seeded PRNG, deterministic.
+- `src/components/portfolio-v2/portfolio-hero.tsx` — Huge count-up total value, delta chips (today/7d/30d/all-time), gradient area chart with range selector (1W/1M/3M/1Y/ALL), cost-basis reference line
+- `src/components/portfolio-v2/allocation-donut.tsx` — Recharts PieChart donut by theme, interactive legend, hover tooltip
+- `src/components/portfolio-v2/allocation-treemap.tsx` — Recharts Treemap by set value, nested cells
+- `src/components/portfolio-v2/risk-return-scatter.tsx` — Recharts ScatterChart (risk vs return per theme)
+- `src/components/portfolio-v2/attribution-card.tsx` — Per-theme attribution table with gain/loss bars
+- `src/components/portfolio-v2/top-movers.tsx` — Gainers/losers split, sparkline + delta per holding
+- `src/components/portfolio-v2/holdings-table.tsx` — Image thumb, name, qty, cost basis, current, gain $/%,  30d sparkline, sortable
+- `src/components/portfolio-v2/collections-strip.tsx` — Collection nav strip linking to detail pages
+- `src/components/portfolio-v2/wishlist-grid.tsx` — Wishlist cards with target prices, deal-detected badges
+- `src/components/portfolio-v2/empty-portfolio.tsx` — Illustrated empty state with CTA
+- `src/app/demo/portfolio/page.tsx` — Full dashboard (hero + donut + treemap + attribution + movers + holdings + collections + wishlist)
+- `src/app/demo/portfolio/empty/page.tsx` — Empty state view
+- `src/app/demo/collections/[id]/page.tsx` — Collection-scoped version using same primitives
+
+**Verification:** `npm run build` (exit 0), all `/demo/portfolio` and `/demo/collections/[id]` routes SSG'd
+
+## Session D7: Market intelligence + named indices — **Complete**
+
+**Goal:** `/demo/market/*` — The differentiator. Five new routes covering BrickX 100 hub, index detail pages, trending, retiring-soon, new releases, and a news feed.
+**Prerequisites:** D1 + D2 + D6 (chart and UI primitives)
+**Model:** Sonnet 4.6
+
+**Deliverables:**
+
+- `src/lib/mock/indices.ts` — Mock data: `INDICES` (5 named indices: BrickX 100, Star Wars Heat, Modulars, Retired Gold, Ideas), `indexHistory()`, `indexConstituents()`, `biggestMovers()`, `trendingGainers()`, `trendingLosers()`, `retiringSoon()`, `newReleases()`, `NEWS_FEED`, `themeHeatmap()`, `indexSparkline()`
+- `src/components/market-v2/index-hero.tsx` — Index hero chart (range selector 1M/3M/1Y/3Y/ALL), count-up value, delta chips, index badge
+- `src/components/market-v2/index-card.tsx` — Featured index card with sparkline, tone-aware gradient, delta chips, links to detail page
+- `src/components/market-v2/movers-strip.tsx` — 4+4 biggest movers grid (gainers + losers), sparklines, volume
+- `src/components/market-v2/trending-table.tsx` — Gainers/losers split table, period toggle (7d/30d/90d), rank, sparkline, volume columns
+- `src/components/market-v2/retiring-card.tsx` — Countdown chip (urgency colors), risk bar, retirement appreciation reference, sparkline
+- `src/components/market-v2/new-release-card.tsx` — First-N-days mini-chart, price vs MSRP delta chip
+- `src/components/market-v2/news-feed.tsx` — News items with kind badge, impact indicator, date, headline + summary
+- `src/components/market-v2/theme-heatmap.tsx` — 9-theme heatmap bar chart, period toggle, color-coded cells + legend
+- `src/components/market-v2/index-constituents.tsx` — Constituents table with weight, sparkline, 30d delta, all-time appreciation
+- `src/app/demo/market/page.tsx` — Hub: BrickX 100 hero + 4-index grid + movers strip + heatmap + news preview + quick-links
+- `src/app/demo/market/indices/[slug]/page.tsx` — Index detail: hero + methodology accordion + rebalance notes + constituents table (SSG via `generateStaticParams`)
+- `src/app/demo/market/trending/page.tsx` — Full trending table page
+- `src/app/demo/market/retiring/page.tsx` — Retiring soon grid with methodology note
+- `src/app/demo/market/new/page.tsx` — New releases grid with stats strip
+- `src/app/demo/market/news/page.tsx` — Full news feed with filter stub
+
+**Verification:** `npm run build` (exit 0), all 6 new demo/market routes SSG'd (including 5 index detail pages)

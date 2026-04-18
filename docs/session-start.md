@@ -49,11 +49,14 @@ Check three things:
 | D4: Catalog + Search + cmd+K         | **Complete** |
 | D5: Set detail (flagship) redo       | **Complete** |
 | F3: Onboarding + bulk CSV import/export | **Complete** |
-| D6: Portfolio + Collections dashboard | Pending      |
+| D6: Portfolio + Collections dashboard | **Complete** |
+| D7: Market intelligence + named indices | **Complete** |
 
 ## What to Work on Next
 
-**Next session: D6** — Portfolio + Collections dashboard (`/demo/portfolio`, `/demo/collections/[id]`). Requires Opus 4.7 (flagship dashboard). Now backed by real F2 data (portfolio_snapshots). See `docs/roadmap.md` § Session D6 for full scope.
+**Next session: D8** — Motion pass + migration to production. Requires Opus 4.7. Adds Framer Motion page transitions, stagger entrances, count-up numerics, chart reveals, and skeleton→content crossfades across all demo pages, then migrates `/components-v2` → `/components` and deletes `/demo/*` routes. See `docs/roadmap.md` § Session D8 for full scope.
+
+**Prerequisite check:** D8 needs D1–D7 commits in `git log`. D7 commit message: `Session D7: market intelligence + named indices — /demo/market/*`.
 
 ## Key References
 

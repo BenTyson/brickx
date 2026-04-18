@@ -49,13 +49,30 @@ brickx/
 │   │   │   ├── alerts/      # Price alerts list + preferences
 │   │   │   ├── collections/ # Collections list + detail pages
 │   │   │   └── portfolio/   # Portfolio dashboard
-│   │   ├── market/          # Market intelligence pages (public)
+│   │   ├── market/          # Market intelligence pages (public, live routes)
 │   │   │   ├── layout.tsx
 │   │   │   ├── page.tsx         # Hub: category cards + trending preview
 │   │   │   ├── trending/        # 7d/30d price movers
 │   │   │   ├── retiring/        # Retired sets
 │   │   │   ├── new-releases/    # Recent releases
 │   │   │   └── top-investments/ # Highest investment scores
+│   │   ├── demo/            # Design workbench (not linked from production nav, robots: noindex)
+│   │   │   ├── layout.tsx       # DemoCommandPaletteProvider wrapper
+│   │   │   ├── tokens/          # Design token gallery
+│   │   │   ├── components/      # Component kitchen-sink
+│   │   │   ├── landing/         # Redesigned landing page demo
+│   │   │   ├── sets/            # Catalog + set detail demos
+│   │   │   ├── themes/          # Theme hub + detail demos
+│   │   │   ├── portfolio/       # Portfolio dashboard demo (+ /empty)
+│   │   │   ├── collections/[id] # Collection detail demo
+│   │   │   ├── wishlist/        # Wishlist demo
+│   │   │   └── market/          # Market intelligence demos
+│   │   │       ├── page.tsx         # Hub: BrickX 100 + indices grid + movers + heatmap + news
+│   │   │       ├── indices/[slug]/  # Index detail: hero + methodology + constituents (SSG, 5 slugs)
+│   │   │       ├── trending/        # Gainers/losers table with period toggle
+│   │   │       ├── retiring/        # Retiring-soon grid with countdown chips + risk bars
+│   │   │       ├── new/             # New releases grid with first-N-days charts
+│   │   │       └── news/            # News feed (stub data)
 │   │   ├── sitemap.ts       # Dynamic sitemap (~26K set pages)
 │   │   ├── robots.ts        # Robots.txt (disallow private routes)
 │   │   ├── sets/            # Catalog & detail pages
@@ -78,8 +95,16 @@ brickx/
 │   │   ├── collections/     # Collection components (card, dialogs, items table)
 │   │   ├── detail/          # Detail page components (breadcrumb, stats, chart, related, add-to-collection)
 │   │   ├── landing/         # Landing page sections (hero, stats, features, etc.)
+│   │   ├── landing-v2/      # Redesigned landing sections (demo namespace)
 │   │   ├── market/          # Market intelligence components (hub-card, period-toggle, price-filter, pagination)
+│   │   ├── market-v2/       # Redesigned market components (index-hero, index-card, movers-strip, trending-table, retiring-card, new-release-card, news-feed, theme-heatmap, index-constituents)
+│   │   ├── motion/          # Framer Motion wrappers (FadeIn, SlideUp, CountUp, StaggerChildren, ScrollReveal)
 │   │   ├── portfolio/       # Portfolio components (summary cards, breakdown table)
+│   │   ├── portfolio-v2/    # Redesigned portfolio components (hero, donut, treemap, scatter, attribution, movers, holdings, collections-strip, wishlist, empty)
+│   │   ├── catalog-v2/      # Redesigned catalog components (filter-rail, active-filter-bar, dual-range-slider, demo-command-palette, theme-card, etc.)
+│   │   ├── set-detail-v2/   # Redesigned set detail components
+│   │   ├── charts/          # Chart primitives (sparkline.tsx, price-chart-v2.tsx)
+│   │   ├── onboarding/      # Onboarding flow component
 │   │   ├── json-ld.tsx      # Generic JSON-LD script injector
 │   │   ├── logo.tsx         # BrickX logo (SVG, full/icon variants)
 │   │   ├── status-badge.tsx # Set status badge (available/retired/etc.)
@@ -96,7 +121,12 @@ brickx/
 │       │   ├── auth.ts      # signOut()
 │       │   ├── alerts.ts    # createPriceAlert, dismissAlert, markAlertRead, markAllAlertsRead, deleteAlert, updateNotificationPreferences
 │       │   └── collections.ts # create/rename/delete collection, add/update/remove items
-│       ├── mock-data.ts     # Mock LEGO set data (CatalogSet shape, used by landing page)
+│       ├── mock-data.ts     # Legacy mock (landing page only)
+│       ├── mock/            # Demo route mock data (server-safe, no DB)
+│       │   ├── series.ts        # Seeded PRNG series generators (randomWalk, datedRandomWalk, correlatedPair)
+│       │   ├── catalog.ts       # CATALOG_SETS + THEMES + sparklineForSet()
+│       │   ├── portfolio.ts     # HOLDINGS, portfolioSnapshot(), themeAllocations(), topMovers(), etc.
+│       │   └── indices.ts       # INDICES, indexHistory(), biggestMovers(), trendingGainers/Losers(), retiringSoon(), newReleases(), NEWS_FEED, themeHeatmap()
 │       ├── queries/         # Server-side data access (Supabase queries)
 │       │   ├── index.ts     # Barrel export
 │       │   ├── helpers.ts   # Shared SetRow interface + flattenSetRow()
@@ -162,7 +192,13 @@ brickx/
 | `src/components/detail/`      | Set detail page components (breadcrumb, stats, chart, add-to-collection) |
 | `src/components/landing/`     | Landing page sections (page-specific)                                    |
 | `src/components/market/`      | Market intelligence components (hub card, toggles, filters, pagination)  |
+| `src/components/market-v2/`   | Redesigned market components (index-hero, movers-strip, trending-table, retiring/new-release cards, news-feed, theme-heatmap, index-constituents) |
+| `src/components/motion/`      | Framer Motion animation wrappers (FadeIn, SlideUp, CountUp, StaggerChildren, ScrollReveal) |
 | `src/components/portfolio/`   | Portfolio components (summary cards, breakdown table)                    |
+| `src/components/portfolio-v2/` | Redesigned portfolio components (portfolio-hero, allocation-donut/treemap, risk-return-scatter, attribution-card, top-movers, holdings-table, collections-strip, wishlist-grid, empty-portfolio) |
+| `src/components/catalog-v2/`  | Redesigned catalog components (filter-rail, dual-range-slider, demo-command-palette) |
+| `src/components/charts/`      | Chart primitives shared across v2 components (Sparkline, PriceChartV2)   |
+| `src/components/onboarding/`  | Onboarding multi-step flow component                                     |
 
 **shadcn/ui config:** `components.json` at project root. Utils alias: `@/lib/utils/cn` (avoids conflict with `src/lib/utils/` directory).
 
