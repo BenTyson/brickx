@@ -484,7 +484,7 @@ Design and functionality alternate so neither track blocks the other. Total: **1
 | 5 | **F2** — Historical portfolio snapshots | Func | — (done) | Needed before D6 to feed real historical charts |
 | 6 | **D4** — Catalog + Search + cmd+K | Design | — (done) | Core browse experience |
 | 7 | **D5** — Set detail (flagship) redo | Design | — (done) | The page that sells the product |
-| 8 | **F3** — Onboarding + bulk CSV import/export | Func | Sonnet 4.6 | Biggest retention lever |
+| 8 | **F3** — Onboarding + bulk CSV import/export | Func | — (done) | Biggest retention lever |
 | 9 | **D6** — Portfolio + Collections dashboard | Design | Opus 4.7 | Now backed by real F2 data |
 | 10 | **D7** — Market intelligence + named indices | Design | Sonnet 4.6 | Differentiator pages |
 | 11 | **F4** — Admin / Superadmin console | Func | Sonnet 4.6 | Required before wider launch for ops |

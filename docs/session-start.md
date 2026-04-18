@@ -30,21 +30,30 @@ Check three things:
 
 ## Current Status
 
-| Session                            | Status       |
-| ---------------------------------- | ------------ |
-| 1A: Project Setup & DB Schema      | **Complete** |
-| 1B: Infrastructure & API Services  | **Complete** |
-| 1C: Data Seeding & Aggregation     | **Complete** |
-| 2: Design System & Landing Page    | **Complete** |
-| 3A: Data Access Layer & Primitives | **Complete** |
-| 3B: Catalog Page (`/sets`)         | **Complete** |
-| 3C: Detail Page & Price Chart      | **Complete** |
-| 4: Auth & Collection Management    | **Complete** |
-| 5: Market Intelligence & SEO       | **Complete** |
+| Session                              | Status       |
+| ------------------------------------ | ------------ |
+| 1A: Project Setup & DB Schema        | **Complete** |
+| 1B: Infrastructure & API Services    | **Complete** |
+| 1C: Data Seeding & Aggregation       | **Complete** |
+| 2: Design System & Landing Page      | **Complete** |
+| 3A: Data Access Layer & Primitives   | **Complete** |
+| 3B: Catalog Page (`/sets`)           | **Complete** |
+| 3C: Detail Page & Price Chart        | **Complete** |
+| 4: Auth & Collection Management      | **Complete** |
+| 5: Market Intelligence & SEO         | **Complete** |
+| D1: Design tokens, type, motion      | **Complete** |
+| F1: Notification engine (email)      | **Complete** |
+| D2: Core primitives rebuilt          | **Complete** |
+| D3: Landing page redo                | **Complete** |
+| F2: Historical portfolio snapshots   | **Complete** |
+| D4: Catalog + Search + cmd+K         | **Complete** |
+| D5: Set detail (flagship) redo       | **Complete** |
+| F3: Onboarding + bulk CSV import/export | **Complete** |
+| D6: Portfolio + Collections dashboard | Pending      |
 
 ## What to Work on Next
 
-All 5 sessions are complete. The platform has: catalog browsing, set detail pages, auth, collections, portfolio, market intelligence, price alerts, and SEO infrastructure.
+**Next session: D6** — Portfolio + Collections dashboard (`/demo/portfolio`, `/demo/collections/[id]`). Requires Opus 4.7 (flagship dashboard). Now backed by real F2 data (portfolio_snapshots). See `docs/roadmap.md` § Session D6 for full scope.
 
 ## Key References
 

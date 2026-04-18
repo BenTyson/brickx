@@ -97,14 +97,15 @@ alert_status: 'active' | 'triggered' | 'dismissed'
 
 ### users
 
-| Column     | Type        | Constraints      |
-| ---------- | ----------- | ---------------- |
-| id         | UUID        | PK               |
-| email      | TEXT        | UNIQUE, NOT NULL |
-| name       | TEXT        |                  |
-| avatar_url | TEXT        |                  |
-| provider   | TEXT        |                  |
-| created_at | TIMESTAMPTZ | DEFAULT now()    |
+| Column       | Type        | Constraints                                        |
+| ------------ | ----------- | -------------------------------------------------- |
+| id           | UUID        | PK                                                 |
+| email        | TEXT        | UNIQUE, NOT NULL                                   |
+| name         | TEXT        |                                                    |
+| avatar_url   | TEXT        |                                                    |
+| provider     | TEXT        |                                                    |
+| created_at   | TIMESTAMPTZ | DEFAULT now()                                      |
+| onboarded_at | TIMESTAMPTZ | NULL = new user; app layout redirects to /onboarding |
 
 ### collections
 
@@ -157,6 +158,36 @@ alert_status: 'active' | 'triggered' | 'dismissed'
 | created_at            | TIMESTAMPTZ | DEFAULT now()                        |
 | updated_at            | TIMESTAMPTZ | DEFAULT now()                        |
 
+### portfolio_snapshots (migration 016)
+
+| Column           | Type          | Constraints                                          |
+| ---------------- | ------------- | ---------------------------------------------------- |
+| id               | UUID          | PK, DEFAULT gen_random_uuid()                        |
+| user_id          | UUID          | FK → users(id) ON DELETE CASCADE, NOT NULL           |
+| snapshot_date    | DATE          | NOT NULL; UNIQUE(user_id, snapshot_date)             |
+| total_value      | NUMERIC(12,2) | NOT NULL                                             |
+| cost_basis       | NUMERIC(12,2) | NOT NULL                                             |
+| item_count       | INTEGER       | NOT NULL                                             |
+| by_theme_json    | JSONB         | `{ theme_name: value }` map                         |
+| by_condition_json| JSONB         | `{ new: value, used: value }` map                   |
+| created_at       | TIMESTAMPTZ   | DEFAULT now()                                        |
+
+### import_history (migration 017)
+
+| Column        | Type        | Constraints                                           |
+| ------------- | ----------- | ----------------------------------------------------- |
+| id            | UUID        | PK, DEFAULT gen_random_uuid()                         |
+| user_id       | UUID        | FK → users(id) ON DELETE CASCADE, NOT NULL            |
+| format        | TEXT        | CHECK IN ('csv','bricklink_csv','bricklink_xml')      |
+| filename      | TEXT        |                                                       |
+| collection_id | UUID        | FK → collections(id) ON DELETE SET NULL               |
+| rows_total    | INTEGER     | DEFAULT 0                                             |
+| rows_imported | INTEGER     | DEFAULT 0                                             |
+| rows_skipped  | INTEGER     | DEFAULT 0                                             |
+| rows_error    | INTEGER     | DEFAULT 0                                             |
+| error_details | JSONB       |                                                       |
+| created_at    | TIMESTAMPTZ | DEFAULT now()                                         |
+
 ## Relationships
 
 ```
@@ -170,6 +201,9 @@ collection_items.set_id → sets.id
 price_alerts.user_id → users.id (CASCADE)
 price_alerts.set_id → sets.id (CASCADE)
 notification_preferences.user_id → users.id (CASCADE)
+portfolio_snapshots.user_id → users.id (CASCADE)
+import_history.user_id → users.id (CASCADE)
+import_history.collection_id → collections.id (SET NULL)
 ```
 
 ## Indexes
@@ -190,7 +224,7 @@ notification_preferences.user_id → users.id (CASCADE)
 
 **Public read** (no auth required): themes, sets, set_prices, set_market_values, colors, parts, minifigs
 
-**User-scoped CRUD** (auth.uid() = user_id): users (SELECT/INSERT/UPDATE own row), collections (full CRUD own rows), collection_items (full CRUD via collection ownership), price_alerts (full CRUD own rows), notification_preferences (SELECT/INSERT/UPDATE own row)
+**User-scoped CRUD** (auth.uid() = user_id): users (SELECT/INSERT/UPDATE own row), collections (full CRUD own rows), collection_items (full CRUD via collection ownership), price_alerts (full CRUD own rows), notification_preferences (SELECT/INSERT/UPDATE own row), portfolio_snapshots (SELECT/INSERT/UPDATE own rows), import_history (SELECT/INSERT own rows)
 
 ## Triggers
 

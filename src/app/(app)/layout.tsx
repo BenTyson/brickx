@@ -17,6 +17,17 @@ export default async function AppLayout({
     redirect("/sign-in");
   }
 
+  // Redirect new users to onboarding on first sign-in
+  const { data: profile } = await supabase
+    .from("users")
+    .select("onboarded_at")
+    .eq("id", user.id)
+    .single();
+
+  if (profile && !profile.onboarded_at) {
+    redirect("/onboarding");
+  }
+
   return (
     <>
       <SiteHeader />

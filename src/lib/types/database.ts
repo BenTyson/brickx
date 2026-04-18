@@ -256,6 +256,7 @@ export interface Database {
           avatar_url: string | null;
           provider: string | null;
           created_at: string;
+          onboarded_at: string | null;
         };
         Insert: {
           id: string;
@@ -264,6 +265,7 @@ export interface Database {
           avatar_url?: string | null;
           provider?: string | null;
           created_at?: string;
+          onboarded_at?: string | null;
         };
         Update: {
           id?: string;
@@ -272,8 +274,63 @@ export interface Database {
           avatar_url?: string | null;
           provider?: string | null;
           created_at?: string;
+          onboarded_at?: string | null;
         };
         Relationships: [];
+      };
+      import_history: {
+        Row: {
+          id: string;
+          user_id: string;
+          format: "csv" | "bricklink_xml" | "bricklink_csv";
+          filename: string | null;
+          collection_id: string | null;
+          rows_total: number;
+          rows_imported: number;
+          rows_skipped: number;
+          rows_error: number;
+          error_details: Record<string, unknown> | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          format: "csv" | "bricklink_xml" | "bricklink_csv";
+          filename?: string | null;
+          collection_id?: string | null;
+          rows_total?: number;
+          rows_imported?: number;
+          rows_skipped?: number;
+          rows_error?: number;
+          error_details?: Record<string, unknown> | null;
+          created_at?: string;
+        };
+        Update: {
+          format?: "csv" | "bricklink_xml" | "bricklink_csv";
+          filename?: string | null;
+          collection_id?: string | null;
+          rows_total?: number;
+          rows_imported?: number;
+          rows_skipped?: number;
+          rows_error?: number;
+          error_details?: Record<string, unknown> | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "import_history_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "import_history_collection_id_fkey";
+            columns: ["collection_id"];
+            isOneToOne: false;
+            referencedRelation: "collections";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       collections: {
         Row: {

@@ -298,3 +298,44 @@
 - `src/app/(auth)/sign-in/page.tsx` — Fixed pre-existing build error: wrapped SignInForm in Suspense boundary
 
 **Verification:** `npx tsc --noEmit`, `npm run lint`, `npm run format:check`, `npm run build` — all pass
+
+## Session F3: Onboarding + Bulk CSV Import/Export — **Complete**
+
+**Goal:** First-run onboarding flow for new users, CSV/XML bulk import, CSV/JSON export, import audit log.
+**Prerequisites:** F2 (portfolio_snapshots migration must be present)
+**Model:** Sonnet 4.6
+
+### Schema
+
+- `supabase/migrations/017_onboarding_and_import_history.sql` — `users.onboarded_at TIMESTAMPTZ` column; `import_history` table (user_id, format, filename, collection_id, rows_total/imported/skipped/error, error_details JSONB, created_at); RLS: users view/insert own rows
+
+### Parser
+
+- `src/lib/utils/csv-parser.ts` — `parseImportFile(text)` auto-detects format; `parseCSV()` handles flexible column mapping (set_num/item_id/item no. aliases, condition, price, date, notes, qty); `parseBrickLinkXML()` handles BrickStock .bsx format (ITEM blocks, S type only); `normalizeSetNum()` appends `-1` if no variant; `detectFormat()` sniffs XML vs CSV
+
+### Server Actions
+
+- `src/lib/actions/import.ts` — `previewImport(text)`: parses + batch-looks up set IDs, returns `ImportPreview` (matched/unmatched rows with set names); `commitImport(preview, collectionId, filename)`: inserts matched rows, logs to import_history, revalidates paths; `markOnboarded()`: sets users.onboarded_at; `fetchImportHistory()`: last 20 imports for current user
+
+### Export API
+
+- `src/app/api/export/collections/route.ts` — `GET ?format=csv|json&collectionId=<id>` (collectionId optional for all-collections export). Columns: set_num, name, theme, condition, purchase_date, purchase_price, current_value, gain_loss, notes. Auth-required.
+
+### Onboarding
+
+- `src/app/onboarding/layout.tsx` — Auth-required standalone layout (no site header/footer), centered content
+- `src/app/onboarding/page.tsx` — Checks `users.onboarded_at`; if already set, redirects to `/portfolio`; passes collections list to flow
+- `src/components/onboarding/onboarding-flow.tsx` — 3-step client component: (1) Welcome with stats; (2) Import CSV/XML with drag-drop, dry-run preview, commit; (3) Alert preferences with toggles → `markOnboarded()` + redirect to `/portfolio`
+- `src/app/(app)/layout.tsx` — Modified: after auth check, queries `users.onboarded_at`; if null, redirects to `/onboarding`
+
+### Collection UI
+
+- `src/components/collections/import-dialog.tsx` — Dialog with drag-drop zone, 3-stage flow (upload → preview table → done), shows matched/unmatched counts, preview of first 8 matched rows
+- `src/components/collections/export-button.tsx` — Dropdown trigger for CSV/JSON download via export API route
+- `src/app/(app)/collections/[id]/page.tsx` — Modified: added Import + Export buttons to collection header
+
+### Types
+
+- `src/lib/types/database.ts` — Added `users.onboarded_at`; added `import_history` table type with full Row/Insert/Update/Relationships
+
+**Verification:** `npm run build` (exit 0), `npm test` (52/52 pass)

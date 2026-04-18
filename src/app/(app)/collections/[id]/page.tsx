@@ -5,6 +5,8 @@ import { ChevronRight } from "lucide-react";
 import { PageContainer } from "@/components/page-container";
 import { fetchCollectionDetail } from "@/lib/queries";
 import { CollectionItemsTable } from "@/components/collections/collection-items-table";
+import { ImportDialog } from "@/components/collections/import-dialog";
+import { ExportButton } from "@/components/collections/export-button";
 
 interface CollectionDetailPageProps {
   params: Promise<{ id: string }>;
@@ -64,41 +66,47 @@ export default async function CollectionDetailPage({
       </nav>
 
       {/* Header + Summary */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{collection.name}</h1>
-        <div className="text-muted-foreground mt-2 flex flex-wrap gap-4 text-sm">
-          <span>
-            {collection.items.length}{" "}
-            {collection.items.length === 1 ? "set" : "sets"}
-          </span>
-          {totalValue > 0 && (
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <h1 className="text-3xl font-bold tracking-tight">{collection.name}</h1>
+          <div className="text-muted-foreground mt-2 flex flex-wrap gap-4 text-sm">
             <span>
-              Value:{" "}
-              <span className="text-foreground font-medium">
-                ${totalValue.toFixed(2)}
+              {collection.items.length}{" "}
+              {collection.items.length === 1 ? "set" : "sets"}
+            </span>
+            {totalValue > 0 && (
+              <span>
+                Value:{" "}
+                <span className="text-foreground font-medium">
+                  ${totalValue.toFixed(2)}
+                </span>
               </span>
-            </span>
-          )}
-          {totalCost > 0 && (
-            <span>
-              Cost:{" "}
-              <span className="text-foreground font-medium">
-                ${totalCost.toFixed(2)}
+            )}
+            {totalCost > 0 && (
+              <span>
+                Cost:{" "}
+                <span className="text-foreground font-medium">
+                  ${totalCost.toFixed(2)}
+                </span>
               </span>
-            </span>
-          )}
-          {totalCost > 0 && totalValue > 0 && (
-            <span
-              className={
-                totalValue - totalCost >= 0
-                  ? "text-success"
-                  : "text-destructive"
-              }
-            >
-              {totalValue - totalCost >= 0 ? "+" : ""}
-              {(((totalValue - totalCost) / totalCost) * 100).toFixed(1)}%
-            </span>
-          )}
+            )}
+            {totalCost > 0 && totalValue > 0 && (
+              <span
+                className={
+                  totalValue - totalCost >= 0
+                    ? "text-success"
+                    : "text-destructive"
+                }
+              >
+                {totalValue - totalCost >= 0 ? "+" : ""}
+                {(((totalValue - totalCost) / totalCost) * 100).toFixed(1)}%
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="flex shrink-0 gap-2">
+          <ImportDialog collectionId={collection.id} />
+          <ExportButton collectionId={collection.id} />
         </div>
       </div>
 
