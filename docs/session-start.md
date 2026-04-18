@@ -18,7 +18,7 @@ Check three things:
    git branch -a                              # find the branch with the prior work
    git merge --ff-only claude/<prior-branch>  # fast-forward it in
    ```
-   The plan file `/Users/bentyson/.claude/plans/nifty-nibbling-jellyfish.md` is the authority on session dependencies.
+   The plan file `docs/roadmap.md` is the authority on session dependencies.
 3. **`.env.local` exists.** It's gitignored, so fresh worktrees don't have it. Middleware will crash on first request without it:
    ```bash
    cp /Users/bentyson/brickx/.env.local .env.local   # or symlink

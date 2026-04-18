@@ -6,7 +6,7 @@
 
 ### Starting a session
 1. Open a new Claude Code session in the worktree (or create a new worktree if you want isolation)
-2. Prompt: `Execute Session {ID} from the plan at .claude/plans/nifty-nibbling-jellyfish.md` (e.g. "Execute Session D1…")
+2. Prompt: `Execute Session {ID} from the plan at docs/roadmap.md` (e.g. "Execute Session D1…")
 3. The session reads this plan, scopes itself to that session's deliverables only, builds, runs `npm run build`, and stops
 4. Review, request tweaks or commit, then end the session
 
@@ -35,6 +35,17 @@ See `docs/session-start.md` § Worktree Preflight for the same procedure with mo
 - **Do not touch existing live routes during D1–D7.** All visual work lives under `/app/demo/*` until the D8 migration session.
 - **Do not skip sessions out of order within a track** without re-reading the plan — dependencies exist (e.g. D6 assumes D1+D2 primitives; F2 is required before D6 has real chart data).
 
+### Model selection (per session)
+
+Each remaining session is annotated with a `**Model:**` line. Heuristic:
+- **Opus 4.7** — flagship visual judgment, destructive cross-cutting refactors, prompt engineering, ambiguous architectural tradeoffs. Spend the tokens where quality drives the outcome.
+- **Sonnet 4.6** — default for most sessions. Pattern-driven CRUD, infra setup, building from primitives that already exist, integrations with well-documented services.
+- **Haiku 4.5** — not currently flagged for any session; reserve for purely mechanical follow-ups (single-file renames, copy-only edits, batch import sweeps).
+
+Set with `/model opus` (or `sonnet` / `haiku`) at the start of the session — it's a per-session choice, not per-task. Don't switch mid-session unless the work has clearly entered a different mode (e.g. dropping from Opus to Sonnet for a mechanical migration tail after the design judgment is done).
+
+The Model column in the sequencing table at the bottom is the source of truth.
+
 ### Sequencing (locked)
 See the "Session sequencing" table at the bottom. Interleaves design (D) and functionality (F). Next session to run is **D1**.
 
@@ -49,7 +60,7 @@ Before stopping, the agent MUST produce a handoff block with:
 2. **Next session ID** per the sequencing table.
 3. **Ready-to-paste prompt** for the next agent, in this exact format:
    ```
-   Execute Session {NEXT_ID} from the plan at .claude/plans/nifty-nibbling-jellyfish.md
+   Execute Session {NEXT_ID} from the plan at docs/roadmap.md
    ```
    Plus any session-specific flags the user should be aware of (e.g. "this session assumes D1 primitives are in place — verify `src/components/motion/` exists before starting").
 4. **Open questions / tweaks requested** the user flagged but hasn't resolved — carry-forward for next session.
@@ -212,6 +223,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 **Files:** `src/app/demo/sets/[id]/page.tsx`, `src/components/set-detail-v2/*`
 
 ## Session D6 — Portfolio + Collections dashboard
+**Model:** Opus 4.7 — flagship dashboard; dense composition (donut + treemap + attribution + holdings) where visual judgment dominates and the page sets the pattern for D7.
 **Goal:** `/demo/portfolio`, `/demo/collections/[id]` — Robinhood-grade.
 
 - Portfolio hero: huge total value with count-up, delta today/7d/30d/all chips, full-width gradient area chart of historical portfolio value (mocked)
@@ -227,6 +239,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 **Files:** `src/app/demo/portfolio/page.tsx`, `src/components/portfolio-v2/*`
 
 ## Session D7 — Market intelligence + Named indices
+**Model:** Sonnet 4.6 — extends D6 dashboard primitives across multiple market pages; composition over invention once the pattern exists.
 **Goal:** `/demo/market/*` — the differentiator. Indices as a product.
 
 - `/demo/market` hub: hero with BrickX 100 live chart, featured indices grid (Star Wars Heat Index, Modulars Index, Retired Gold, Ideas Index), biggest movers strip
@@ -240,6 +253,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 **Files:** `src/app/demo/market/*`, `src/components/market-v2/*`, `src/lib/mock/indices.ts`
 
 ## Session D8 — Motion pass + migration to production
+**Model:** Opus 4.7 — destructive cross-cutting refactor that touches every page; deletes old components and rewires imports. Mistakes here regress shipped surfaces, so quality of judgment matters more than speed.
 **Goal:** Motion layer across all demo pages, then migrate polished components into live routes.
 
 - Page transitions (native View Transitions API with Framer Motion fallback)
@@ -256,6 +270,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 **Files:** move from `-v2` suffix back to canonical names, delete `/app/demo/*`
 
 ## Session D9 — Mobile polish + auth pages + empty/loading states + a11y
+**Model:** Sonnet 4.6 — many small surfaces (mobile nav, auth pages, empty states, skeletons, a11y fixes); pattern-driven once D2 primitives are reused.
 **Goal:** Every surface polished, not just desktop happy-path.
 
 - Mobile bottom tab nav with blur backdrop + active state animation
@@ -271,6 +286,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 **Files:** `src/app/auth/*`, mobile components, a11y fixes in primitives
 
 ## Session D10 — Brand voice, copy pass, OG images, polish sweep
+**Model:** Opus 4.7 — copywriting voice across every headline / CTA / empty state demands taste; OG generation + favicons are mechanical but secondary to the prose pass.
 **Goal:** Final polish, copywriting, and launch-readiness visuals.
 
 - Copywriting pass: every headline, CTA, empty state, tooltip, error message rewritten in a distinctive brand voice (confident, data-literate, a little irreverent — "LEGO as an asset class" register, not "Welcome to our awesome platform")
@@ -318,6 +334,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 - Top movers in collection query
 
 ### Session F3 — Onboarding + Bulk import/export
+**Model:** Sonnet 4.6 — moderate scope; CSV parser + onboarding flow follow established UI patterns.
 **Why:** First-run experience is "empty dashboard, good luck." Biggest conversion/retention lever.
 
 - Onboarding route `/onboarding` with 3-step flow (welcome → import or add manually → set alert preferences)
@@ -330,6 +347,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 - "Import from Brickset account" stub (document as F4 future work)
 
 ### Session F4 — Admin / Superadmin console
+**Model:** Sonnet 4.6 — full-stack scaffolding (migration + RLS + 6 admin pages + audit log); volume of well-templated work, not novelty.
 **Why:** You have zero ops surface. Today you SSH Supabase SQL editor. This is untenable at scale.
 
 - Schema: add `users.role` enum (`user`, `admin`, `superadmin`) with default `user`; seed your account as superadmin. RLS policy bypass for admin reads.
@@ -344,6 +362,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 - Tests: role middleware, policy enforcement
 
 ### Session F5 — Production infrastructure
+**Model:** Sonnet 4.6 — standard infra setup (Sentry, PostHog, Upstash, CSP, CI, Playwright) following well-documented vendor flows.
 **Why:** No Sentry, no analytics, no rate limiting, no CSP, no CI. Can't launch safely.
 
 - Deploy target: decide Vercel vs Railway (recommend Vercel for Next.js 15 + Supabase; Railway still fine). Write `vercel.json` or Railway config.
@@ -361,6 +380,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 ## Phase B — Growth features
 
 ### Session F6 — Discovery 2.0
+**Model:** Sonnet 4.6 — search/typeahead/compare are well-known patterns built atop existing primitives (cmd+K shell + Postgres tsvector).
 **Why:** Differentiate from BrickEconomy with a world-class search/compare surface.
 
 - Command palette live (from D2) wired to real search
@@ -374,6 +394,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 - Recently viewed (localStorage)
 
 ### Session F7 — Public portfolios + social foundations
+**Model:** Sonnet 4.6 — schema additions + public profile route + follow graph + activity feed; standard plumbing throughout.
 **Why:** Collectors love to flex. Public portfolios are viral loops.
 
 - `users.is_public_profile`, `users.slug` columns
@@ -386,6 +407,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 - Anti-abuse: report button, flagged content queue in admin (F4)
 
 ### Session F8 — Community + Engagement
+**Model:** Sonnet 4.6 — reviews + threaded comments + moderation; CRUD with established patterns and F4 admin reuse.
 **Why:** Reviews/comments convert a catalog into a community.
 
 - Set reviews: `set_reviews(user_id, set_id, rating, title, body, verified_owner_flag)` with aggregate stars on set detail
@@ -396,6 +418,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 - User "watchlist" separate from wishlist — lightweight follow-without-buy-intent for price-watching
 
 ### Session F9 — AI-powered insights
+**Model:** Opus 4.7 — prompt design + NL-to-filter parsing + anomaly detection; the work *is* AI judgment, exactly Opus' strength.
 **Why:** Claude API enables portfolio analysis that BrickVault/BrickEconomy can't touch.
 
 - `/api/insights/portfolio` server route calling Claude Sonnet with portfolio data, returns markdown-rendered insight card
@@ -452,27 +475,27 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 
 Design and functionality alternate so neither track blocks the other. Total: **19 sessions to public launch + growth features.**
 
-| # | Session | Track | Rationale |
-|---|---------|-------|-----------|
-| 1 | **D1** — Foundation: tokens, type, motion | Design | Unblocks every subsequent visual session |
-| 2 | **F1** — Notification engine | Func | Closes highest-visibility V1 stub (email alerts) |
-| 3 | **D2** — Core primitives rebuilt | Design | Reusable across all later design sessions |
-| 4 | **D3** — Landing page redo | Design | Flashy early win; marketing surface |
-| 5 | **F2** — Historical portfolio snapshots | Func | Needed before D6 to feed real historical charts |
-| 6 | **D4** — Catalog + Search + cmd+K | Design | Core browse experience |
-| 7 | **D5** — Set detail (flagship) redo | Design | The page that sells the product |
-| 8 | **F3** — Onboarding + bulk CSV import/export | Func | Biggest retention lever |
-| 9 | **D6** — Portfolio + Collections dashboard | Design | Now backed by real F2 data |
-| 10 | **D7** — Market intelligence + named indices | Design | Differentiator pages |
-| 11 | **F4** — Admin / Superadmin console | Func | Required before wider launch for ops |
-| 12 | **D8** — Motion pass + migration to production | Design | Move `/demo/*` into live routes |
-| 13 | **D9** — Mobile + auth + empty/loading + a11y | Design | Every surface polished |
-| 14 | **D10** — Brand voice + OG images + final polish | Design | Launch-readiness visuals |
-| 15 | **F5** — Production infrastructure | Func | Sentry, PostHog, rate limiting, CSP, CI, deploy |
-| — | **🚀 Public soft launch** | — | After F5 |
-| 16 | **F6** — Discovery 2.0 | Func | Growth: search excellence, compare, similar |
-| 17 | **F7** — Public portfolios + social foundations | Func | Growth: viral loop |
-| 18 | **F8** — Community (reviews + comments) | Func | Growth: catalog → community |
-| 19 | **F9** — AI-powered insights | Func | Growth: Claude-backed differentiation |
+| # | Session | Track | Model | Rationale |
+|---|---------|-------|-------|-----------|
+| 1 | **D1** — Foundation: tokens, type, motion | Design | — (done) | Unblocks every subsequent visual session |
+| 2 | **F1** — Notification engine | Func | — (done) | Closes highest-visibility V1 stub (email alerts) |
+| 3 | **D2** — Core primitives rebuilt | Design | — (done) | Reusable across all later design sessions |
+| 4 | **D3** — Landing page redo | Design | — (done) | Flashy early win; marketing surface |
+| 5 | **F2** — Historical portfolio snapshots | Func | — (done) | Needed before D6 to feed real historical charts |
+| 6 | **D4** — Catalog + Search + cmd+K | Design | — (done) | Core browse experience |
+| 7 | **D5** — Set detail (flagship) redo | Design | — (done) | The page that sells the product |
+| 8 | **F3** — Onboarding + bulk CSV import/export | Func | Sonnet 4.6 | Biggest retention lever |
+| 9 | **D6** — Portfolio + Collections dashboard | Design | Opus 4.7 | Now backed by real F2 data |
+| 10 | **D7** — Market intelligence + named indices | Design | Sonnet 4.6 | Differentiator pages |
+| 11 | **F4** — Admin / Superadmin console | Func | Sonnet 4.6 | Required before wider launch for ops |
+| 12 | **D8** — Motion pass + migration to production | Design | Opus 4.7 | Move `/demo/*` into live routes |
+| 13 | **D9** — Mobile + auth + empty/loading + a11y | Design | Sonnet 4.6 | Every surface polished |
+| 14 | **D10** — Brand voice + OG images + final polish | Design | Opus 4.7 | Launch-readiness visuals |
+| 15 | **F5** — Production infrastructure | Func | Sonnet 4.6 | Sentry, PostHog, rate limiting, CSP, CI, deploy |
+| — | **🚀 Public soft launch** | — | — | After F5 |
+| 16 | **F6** — Discovery 2.0 | Func | Sonnet 4.6 | Growth: search excellence, compare, similar |
+| 17 | **F7** — Public portfolios + social foundations | Func | Sonnet 4.6 | Growth: viral loop |
+| 18 | **F8** — Community (reviews + comments) | Func | Sonnet 4.6 | Growth: catalog → community |
+| 19 | **F9** — AI-powered insights | Func | Opus 4.7 | Growth: Claude-backed differentiation |
 
 After session 19, reassess with real usage data before committing to Phases C/D/E.
