@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useMemo } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils/cn";
 import type { SeriesPoint } from "@/lib/mock/series";
 
@@ -22,6 +23,12 @@ interface SparklineProps {
   area?: boolean;
   /** Draw a small terminal dot at the latest point. Default true. */
   showEndDot?: boolean;
+  /** Animate the line on mount (path draw). Default true. */
+  animate?: boolean;
+  /** Path-draw duration seconds. Default 1.1. */
+  animationDuration?: number;
+  /** Stagger start time so a grid of sparks doesn't all draw at once. */
+  animationDelay?: number;
   className?: string;
   ariaLabel?: string;
 }
@@ -52,10 +59,14 @@ export function Sparkline({
   tone = "auto",
   area = true,
   showEndDot = true,
+  animate = true,
+  animationDuration = 1.1,
+  animationDelay = 0,
   className,
   ariaLabel,
 }: SparklineProps) {
   const gradientId = useId();
+  const reduceMotion = useReducedMotion();
   const values = useMemo(() => normalize(data), [data]);
 
   const resolvedTone: Exclude<Tone, "auto"> = useMemo(() => {
@@ -177,23 +188,59 @@ export function Sparkline({
           <stop offset="100%" stopColor={color} stopOpacity={0} />
         </linearGradient>
       </defs>
-      {area && <path d={areaPath} fill={`url(#${gradientId})`} />}
-      <path
+      {area && (
+        <motion.path
+          d={areaPath}
+          fill={`url(#${gradientId})`}
+          initial={
+            animate && !reduceMotion ? { opacity: 0 } : { opacity: 1 }
+          }
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: animationDuration * 0.9,
+            delay: animationDelay + animationDuration * 0.25,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+        />
+      )}
+      <motion.path
         d={path}
         fill="none"
         stroke={color}
         strokeWidth={strokeWidth}
         strokeLinecap="round"
         strokeLinejoin="round"
+        initial={
+          animate && !reduceMotion
+            ? { pathLength: 0, opacity: 0.6 }
+            : { pathLength: 1, opacity: 1 }
+        }
+        animate={{ pathLength: 1, opacity: 1 }}
+        transition={{
+          duration: animationDuration,
+          delay: animationDelay,
+          ease: [0.22, 1, 0.36, 1],
+        }}
       />
       {showEndDot && (
-        <circle
+        <motion.circle
           cx={endX}
           cy={endY}
           r={1.6}
           fill={color}
           stroke="var(--bg-base)"
           strokeWidth={0.75}
+          initial={
+            animate && !reduceMotion
+              ? { opacity: 0, scale: 0.2 }
+              : { opacity: 1, scale: 1 }
+          }
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{
+            duration: 0.3,
+            delay: animationDelay + animationDuration * 0.85,
+          }}
+          style={{ transformOrigin: `${endX}px ${endY}px` }}
         />
       )}
     </svg>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { retiringSoon } from "@/lib/mock/indices";
 import { RetiringCard } from "@/components/market-v2/retiring-card";
+import { StaggerChildren } from "@/components/motion";
 
 export const metadata: Metadata = {
   title: "Retiring Soon demo · BrickX",
@@ -44,11 +45,14 @@ export default function RetiringSoonPage() {
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <StaggerChildren
+          className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          stagger={0.04}
+        >
           {entries.map((entry) => (
             <RetiringCard key={entry.set.id} entry={entry} />
           ))}
-        </div>
+        </StaggerChildren>
 
         {/* Methodology note */}
         <div className="mt-8 rounded-2xl border border-border-thin bg-bg-raised p-5 sm:p-6">

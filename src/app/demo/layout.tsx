@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { DemoCommandPaletteProvider } from "@/components/catalog-v2/demo-command-palette";
+import { PageTransition } from "@/components/motion/page-transition";
+import { ToastProvider } from "@/components/motion/toast";
 
 export const metadata: Metadata = {
   title: "BrickX Demo Workbench",
@@ -15,7 +17,11 @@ export default function DemoLayout({
 }) {
   return (
     <DemoCommandPaletteProvider>
-      <div className="min-h-screen bg-bg-base text-text-primary">{children}</div>
+      <ToastProvider>
+        <div className="min-h-screen bg-bg-base text-text-primary">
+          <PageTransition>{children}</PageTransition>
+        </div>
+      </ToastProvider>
     </DemoCommandPaletteProvider>
   );
 }

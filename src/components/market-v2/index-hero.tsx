@@ -10,6 +10,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils/cn";
 import { CountUp } from "@/components/motion/count-up";
 import { DeltaChip } from "@/components/ui/delta-chip";
@@ -57,6 +58,7 @@ interface IndexHeroProps {
 
 export function IndexHero({ index, className }: IndexHeroProps) {
   const [range, setRange] = useState<RangeKey>("1Y");
+  const reduceMotion = useReducedMotion();
   const series = useMemo(() => indexHistory(index.slug, range), [index.slug, range]);
 
   const first = series[0]?.v ?? 100;
@@ -181,8 +183,10 @@ export function IndexHero({ index, className }: IndexHeroProps) {
                   strokeWidth={1.75}
                   fill={`url(#ix-grad-${index.slug})`}
                   activeDot={{ r: 3.5, strokeWidth: 0 }}
-                  isAnimationActive
-                  animationDuration={900}
+                  isAnimationActive={!reduceMotion}
+                  animationBegin={120}
+                  animationDuration={1100}
+                  animationEasing="ease-out"
                 />
               </AreaChart>
             </ResponsiveContainer>

@@ -252,22 +252,34 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 
 **Files:** `src/app/demo/market/*`, `src/components/market-v2/*`, `src/lib/mock/indices.ts`
 
-## Session D8 — Motion pass + migration to production
-**Model:** Opus 4.7 — destructive cross-cutting refactor that touches every page; deletes old components and rewires imports. Mistakes here regress shipped surfaces, so quality of judgment matters more than speed.
-**Goal:** Motion layer across all demo pages, then migrate polished components into live routes.
+## Session D8a — Motion pass across /demo/*
+**Model:** Opus 4.7 — motion taste and consistency across 17 demo routes; set the cadence that D8b will carry into live routes.
+**Goal:** Apply the motion layer to every /demo/* page so the demos feel shipped. No live-route changes. Zero migration risk.
 
-- Page transitions (native View Transitions API with Framer Motion fallback)
-- Stagger entrance for lists/grids on viewport entry
-- Count-up for every numeric stat card on mount
-- Chart reveal animation (path draw)
-- Toast slide-in with spring physics
-- Button press feedback (scale 0.98)
-- Skeleton → content crossfade
-- Navigation link underline slide
-- **Migrate:** component-by-component, replace imports from `/components` with `/components-v2`, delete old versions, delete `/demo` routes once migration verified. One commit per major component family.
-- Run `npm run build` + Lighthouse audit per page; fix regressions
+- Page transitions (native View Transitions API with Framer Motion fallback) at the demo layout level
+- Stagger entrance for lists/grids on viewport entry (apply existing `<StaggerChildren>` across demo tables, grids, carousels)
+- Count-up for every numeric stat card on mount (wire existing `<CountUp>` into portfolio/market stat components)
+- Chart reveal animation (path draw) — gradient area charts and sparklines
+- Toast slide-in with spring physics (new `<Toast>` primitive if not present)
+- Button press feedback (scale 0.98) — utility applied to primary buttons
+- Skeleton → content crossfade via `AnimatePresence`
+- Navigation link underline slide (layout primitive, demo header)
+- Reduced-motion (`prefers-reduced-motion`) respected throughout
 
-**Files:** move from `-v2` suffix back to canonical names, delete `/app/demo/*`
+**Files:** `src/components/motion/*` (new page-transition + toast + button primitives), wiring across `src/components/*-v2/*` and `src/app/demo/*`.
+
+## Session D8b — Migration to production
+**Model:** Opus 4.7 — destructive cross-cutting refactor that touches every live page; deletes old components and rewires imports. Mistakes regress shipped surfaces.
+**Goal:** Move polished components into live routes; retire /demo/*.
+
+- Component-by-component migration: replace imports from legacy paths with `-v2` equivalents; rename from `-v2` suffix back to canonical names once the live route uses them
+- Delete old component versions and delete `/app/demo/*` routes once migration verified per family
+- One commit per major component family (landing, catalog, set detail, portfolio, market, themes)
+- Live-route smoke test after each family: sign in, add to collection, create alert, view portfolio chart — no regressions
+- `npm run build` + Lighthouse audit per migrated page; fix regressions
+- Update any internal links (nav, footer, CTAs) that still point at `/demo/*`
+
+**Files:** rename `src/components/*-v2/` → canonical paths, delete legacy components under `src/components/{landing,sets,portfolio,...}/`, delete `src/app/demo/*`.
 
 ## Session D9 — Mobile polish + auth pages + empty/loading states + a11y
 **Model:** Sonnet 4.6 — many small surfaces (mobile nav, auth pages, empty states, skeletons, a11y fixes); pattern-driven once D2 primitives are reused.
@@ -455,7 +467,7 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 - Lighthouse per page: target 95+ performance, 100 a11y, 100 best-practices, 100 SEO
 - Chromatic or Storybook snapshot for primitives (optional but strongly recommended from D2)
 - Record a video per session; post to review doc
-- **D8 migration gate:** `npm run build` green, no console errors, spot-check all live routes
+- **D8b migration gate:** `npm run build` green, no console errors, spot-check all live routes
 - **D10 launch gate:** full E2E walk-through on real iPhone + real desktop; friend/user test with 3 external people
 
 ### Functionality (per-session)
@@ -488,14 +500,15 @@ Design and functionality alternate so neither track blocks the other. Total: **1
 | 9 | **D6** — Portfolio + Collections dashboard | Design | Opus 4.7 | Now backed by real F2 data |
 | 10 | **D7** — Market intelligence + named indices | Design | Sonnet 4.6 | Differentiator pages |
 | 11 | **F4** — Admin / Superadmin console | Func | Sonnet 4.6 | Required before wider launch for ops |
-| 12 | **D8** — Motion pass + migration to production | Design | Opus 4.7 | Move `/demo/*` into live routes |
-| 13 | **D9** — Mobile + auth + empty/loading + a11y | Design | Sonnet 4.6 | Every surface polished |
-| 14 | **D10** — Brand voice + OG images + final polish | Design | Opus 4.7 | Launch-readiness visuals |
-| 15 | **F5** — Production infrastructure | Func | Sonnet 4.6 | Sentry, PostHog, rate limiting, CSP, CI, deploy |
+| 12 | **D8a** — Motion pass across /demo/* | Design | Opus 4.7 | Make demos feel shipped; no live-route risk |
+| 13 | **D8b** — Migration to production | Design | Opus 4.7 | Move `/demo/*` into live routes; delete legacy |
+| 14 | **D9** — Mobile + auth + empty/loading + a11y | Design | Sonnet 4.6 | Every surface polished |
+| 15 | **D10** — Brand voice + OG images + final polish | Design | Opus 4.7 | Launch-readiness visuals |
+| 16 | **F5** — Production infrastructure | Func | Sonnet 4.6 | Sentry, PostHog, rate limiting, CSP, CI, deploy |
 | — | **🚀 Public soft launch** | — | — | After F5 |
-| 16 | **F6** — Discovery 2.0 | Func | Sonnet 4.6 | Growth: search excellence, compare, similar |
-| 17 | **F7** — Public portfolios + social foundations | Func | Sonnet 4.6 | Growth: viral loop |
-| 18 | **F8** — Community (reviews + comments) | Func | Sonnet 4.6 | Growth: catalog → community |
-| 19 | **F9** — AI-powered insights | Func | Opus 4.7 | Growth: Claude-backed differentiation |
+| 17 | **F6** — Discovery 2.0 | Func | Sonnet 4.6 | Growth: search excellence, compare, similar |
+| 18 | **F7** — Public portfolios + social foundations | Func | Sonnet 4.6 | Growth: viral loop |
+| 19 | **F8** — Community (reviews + comments) | Func | Sonnet 4.6 | Growth: catalog → community |
+| 20 | **F9** — AI-powered insights | Func | Opus 4.7 | Growth: Claude-backed differentiation |
 
-After session 19, reassess with real usage data before committing to Phases C/D/E.
+After session 20, reassess with real usage data before committing to Phases C/D/E.

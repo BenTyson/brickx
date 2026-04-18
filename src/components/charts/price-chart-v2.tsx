@@ -12,6 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils/cn";
 import type { DatedPoint, PriceChartEvent } from "@/lib/mock/series";
 
@@ -158,6 +159,7 @@ export function PriceChartV2({
   className,
 }: PriceChartV2Props) {
   const gradId = useId();
+  const reduceMotion = useReducedMotion();
   const [range, setRange] = useState<(typeof RANGES)[number]>(defaultRange);
   const [activeKeys, setActiveKeys] = useState<Set<PriceSeriesKey>>(() => {
     const s = new Set<PriceSeriesKey>(["new"]);
@@ -257,7 +259,13 @@ export function PriceChartV2({
         </div>
       </div>
 
-      <div style={{ height }} className="w-full">
+      <motion.div
+        style={{ height }}
+        className="w-full"
+        initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: reduceMotion ? 0.15 : 0.5, ease: [0.16, 1, 0.3, 1] }}
+      >
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={chartData}
@@ -326,6 +334,10 @@ export function PriceChartV2({
                   fill={`url(#${gradId}-${k})`}
                   activeDot={{ r: 4, strokeWidth: 0 }}
                   connectNulls
+                  isAnimationActive={!reduceMotion}
+                  animationBegin={120}
+                  animationDuration={1100}
+                  animationEasing="ease-out"
                 />
               ) : null,
             )}
@@ -356,7 +368,7 @@ export function PriceChartV2({
             })}
           </AreaChart>
         </ResponsiveContainer>
-      </div>
+      </motion.div>
 
       {visibleEvents.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 border-t border-border-thin pt-3">

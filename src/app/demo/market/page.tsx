@@ -7,6 +7,7 @@ import { IndexCard } from "@/components/market-v2/index-card";
 import { MoversStrip } from "@/components/market-v2/movers-strip";
 import { NewsFeed } from "@/components/market-v2/news-feed";
 import { ThemeHeatmap } from "@/components/market-v2/theme-heatmap";
+import { StaggerChildren } from "@/components/motion";
 
 export const metadata: Metadata = {
   title: "Market Intelligence demo · BrickX",
@@ -72,11 +73,14 @@ export default function MarketHubPage() {
               <ArrowRight className="size-3" aria-hidden />
             </Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StaggerChildren
+            className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+            stagger={0.05}
+          >
             {featuredIndices.map((index) => (
               <IndexCard key={index.slug} index={index} />
             ))}
-          </div>
+          </StaggerChildren>
         </div>
 
         {/* Biggest movers */}
@@ -98,7 +102,10 @@ export default function MarketHubPage() {
         </div>
 
         {/* Quick links footer */}
-        <div className="grid gap-3 border-t border-border-thin pt-6 sm:grid-cols-3">
+        <StaggerChildren
+          className="grid gap-3 border-t border-border-thin pt-6 sm:grid-cols-3"
+          stagger={0.05}
+        >
           {[
             { href: "/demo/market/trending", label: "Trending Sets", sub: "Gainers & losers by period" },
             { href: "/demo/market/retiring", label: "Retiring Soon", sub: "Countdown chips + risk scores" },
@@ -120,7 +127,7 @@ export default function MarketHubPage() {
               <ArrowRight className="size-4 text-text-quaternary transition group-hover:text-accent" aria-hidden />
             </Link>
           ))}
-        </div>
+        </StaggerChildren>
       </div>
     </main>
   );

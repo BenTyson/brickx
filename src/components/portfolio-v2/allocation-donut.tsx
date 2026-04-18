@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils/cn";
 import { themeColor, type ThemeAllocation } from "@/lib/mock/portfolio";
 
@@ -18,6 +19,7 @@ export function AllocationDonut({
 }: AllocationDonutProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const active = activeIndex != null ? allocations[activeIndex] : null;
+  const reduceMotion = useReducedMotion();
 
   return (
     <section
@@ -55,8 +57,10 @@ export function AllocationDonut({
                 strokeWidth={2}
                 startAngle={90}
                 endAngle={-270}
-                isAnimationActive
+                isAnimationActive={!reduceMotion}
+                animationBegin={120}
                 animationDuration={900}
+                animationEasing="ease-out"
               >
                 {allocations.map((a, i) => (
                   <Cell

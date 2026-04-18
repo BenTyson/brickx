@@ -5,6 +5,7 @@ import {
   SlideUp,
   StaggerChildren,
 } from "@/components/motion";
+import { MotionD8aDemos } from "./motion-d8a-demos";
 
 export default function TokensPage() {
   return (
@@ -311,6 +312,16 @@ export default function TokensPage() {
               </ScrollReveal>
             </MotionDemo>
           </div>
+        </Section>
+
+        {/* ── D8a additions ─────────────────────────────── */}
+        <Section index="07" title="Interaction primitives — D8a">
+          <MotionD8aDemos />
+          <p className="text-small text-text-tertiary mt-6 max-w-[640px]">
+            Page transitions are wired at <code className="font-mono">/demo/layout.tsx</code>
+            {" "}— click any route link in the workbench to see the fade+lift.
+            Reduced-motion users get the opacity crossfade only.
+          </p>
         </Section>
 
         {/* ── Closing line ──────────────────────────────── */}

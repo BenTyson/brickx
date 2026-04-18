@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 import { newReleases } from "@/lib/mock/indices";
 import { NewReleaseCard } from "@/components/market-v2/new-release-card";
+import { StaggerChildren } from "@/components/motion";
 
 export const metadata: Metadata = {
   title: "New Releases demo · BrickX",
@@ -51,11 +52,14 @@ export default function NewReleasesPage() {
         </div>
 
         {/* Cards grid */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <StaggerChildren
+          className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+          stagger={0.04}
+        >
           {entries.map((entry) => (
             <NewReleaseCard key={entry.set.id} entry={entry} />
           ))}
-        </div>
+        </StaggerChildren>
       </div>
     </main>
   );

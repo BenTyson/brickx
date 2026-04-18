@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils/cn";
 import { CountUp } from "@/components/motion/count-up";
 import { DeltaChip } from "@/components/ui/delta-chip";
@@ -94,6 +95,7 @@ export function PortfolioHero({
   className,
 }: PortfolioHeroProps) {
   const [range, setRange] = useState<HistoryRangeKey>("1Y");
+  const reduceMotion = useReducedMotion();
   const { series, costBasisLine } = useMemo(
     () => portfolioHistory(range, snapshot),
     [range, snapshot],
@@ -271,8 +273,10 @@ export function PortfolioHero({
                   strokeWidth={1.75}
                   fill="url(#portfolio-hero-grad)"
                   activeDot={{ r: 3.5, strokeWidth: 0 }}
-                  isAnimationActive
-                  animationDuration={900}
+                  isAnimationActive={!reduceMotion}
+                  animationBegin={120}
+                  animationDuration={1100}
+                  animationEasing="ease-out"
                 />
               </AreaChart>
             </ResponsiveContainer>
