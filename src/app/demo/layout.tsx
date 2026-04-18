@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { DemoCommandPaletteProvider } from "@/components/catalog-v2/demo-command-palette";
 
 export const metadata: Metadata = {
   title: "BrickX Demo Workbench",
@@ -13,6 +14,8 @@ export default function DemoLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-bg-base text-text-primary">{children}</div>
+    <DemoCommandPaletteProvider>
+      <div className="min-h-screen bg-bg-base text-text-primary">{children}</div>
+    </DemoCommandPaletteProvider>
   );
 }
