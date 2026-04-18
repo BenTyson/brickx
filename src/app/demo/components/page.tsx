@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { FadeIn, SlideUp } from "@/components/motion";
@@ -12,7 +12,7 @@ import { DataTableV2, type DataTableColumn } from "@/components/ui/data-table-v2
 import { DeltaChip } from "@/components/ui/delta-chip";
 import { BidAskPair } from "@/components/ui/bid-ask-pair";
 import { IndexBadge } from "@/components/ui/index-badge";
-import { CommandPalette, type CommandItem } from "@/components/ui/command-palette";
+import { useDemoPalette } from "@/components/catalog-v2/demo-command-palette";
 import { correlatedPair, datedRandomWalk, randomWalk } from "@/lib/mock/series";
 
 /* ── mock data ──────────────────────────────────────────────────── */
@@ -75,21 +75,6 @@ const setCards = [
   { id: "21322", name: "Pirates of Barracuda Bay", theme: "Ideas", year: 2020, status: "exclusive" as const, imgUrl: null, msrp: 199.99, current: 620, delta: 18.5, series: randomWalk({ points: 45, start: 550, vol: 0.02, drift: 0.008, seed: 104 }) },
 ];
 
-const cmdItems: CommandItem[] = [
-  ...movers.map<CommandItem>((m) => ({
-    id: `set-${m.id}`,
-    title: m.name,
-    subtitle: `${m.id} · ${m.theme}`,
-    group: "Sets",
-    href: `#${m.id}`,
-    keywords: [m.theme],
-  })),
-  { id: "idx-brickx-100", title: "BrickX 100", subtitle: "Flagship index", group: "Indices", href: "#idx" },
-  { id: "idx-heat", title: "Star Wars Heat Index", subtitle: "Theme index", group: "Indices", href: "#heat" },
-  { id: "theme-modular", title: "Modular Buildings", subtitle: "Theme", group: "Themes", href: "#modular" },
-  { id: "theme-ideas", title: "Ideas", subtitle: "Theme", group: "Themes", href: "#ideas" },
-];
-
 /* ── section wrapper ───────────────────────────────────────────── */
 
 function Section({
@@ -126,7 +111,7 @@ function Section({
 /* ── page ──────────────────────────────────────────────────────── */
 
 export default function ComponentsDemoPage() {
-  const [paletteOpen, setPaletteOpen] = useState(false);
+  const { open: openPalette } = useDemoPalette();
 
   return (
     <main className="mx-auto max-w-[1200px] px-6 py-20 sm:px-10 lg:px-14">
@@ -144,7 +129,7 @@ export default function ComponentsDemoPage() {
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <button
             type="button"
-            onClick={() => setPaletteOpen(true)}
+            onClick={openPalette}
             className="inline-flex items-center gap-2 rounded-full border border-border-emphasis bg-bg-raised px-4 py-2 text-small text-text-secondary transition hover:bg-bg-overlay"
           >
             <span>Open command palette</span>
@@ -343,7 +328,7 @@ export default function ComponentsDemoPage() {
       >
         <button
           type="button"
-          onClick={() => setPaletteOpen(true)}
+          onClick={openPalette}
           className="inline-flex items-center gap-3 rounded-xl border border-border-thin bg-bg-raised px-4 py-3 text-small text-text-tertiary transition hover:border-border-emphasis hover:text-text-primary"
         >
           <span>Search sets, themes, minifigs…</span>
@@ -352,12 +337,6 @@ export default function ComponentsDemoPage() {
           </kbd>
         </button>
       </Section>
-
-      <CommandPalette
-        items={cmdItems}
-        open={paletteOpen}
-        onOpenChange={setPaletteOpen}
-      />
     </main>
   );
 }
