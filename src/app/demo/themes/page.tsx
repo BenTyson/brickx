@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { FadeIn } from "@/components/motion";
+import { FadeIn, StaggerChildren } from "@/components/motion";
 import { ThemeCard } from "@/components/catalog-v2/theme-card";
 import { CATALOG_THEMES } from "@/lib/mock/catalog";
 import type { Metadata } from "next";
@@ -54,7 +54,10 @@ export default function ThemesHubPage() {
             {pinned.length} blue-chip themes
           </span>
         </div>
-        <div className="grid gap-5 md:grid-cols-2">
+        <StaggerChildren
+          className="grid gap-5 md:grid-cols-2"
+          stagger={0.06}
+        >
           {pinned.map((t) => (
             <ThemeCard
               key={t.slug}
@@ -63,7 +66,7 @@ export default function ThemesHubPage() {
               href={`/demo/themes/${t.slug}`}
             />
           ))}
-        </div>
+        </StaggerChildren>
       </section>
 
       <section className="mt-16" aria-labelledby="all-heading">
@@ -79,7 +82,10 @@ export default function ThemesHubPage() {
             {CATALOG_THEMES.length} tracked
           </span>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <StaggerChildren
+          className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+          stagger={0.04}
+        >
           {rest.map((t) => (
             <ThemeCard
               key={t.slug}
@@ -87,7 +93,7 @@ export default function ThemesHubPage() {
               href={`/demo/themes/${t.slug}`}
             />
           ))}
-        </div>
+        </StaggerChildren>
       </section>
     </main>
   );

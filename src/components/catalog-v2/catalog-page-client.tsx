@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FadeIn } from "@/components/motion";
+import { Crossfade, FadeIn, StaggerChildren } from "@/components/motion";
 import { SetCardV2 } from "@/components/ui/set-card-v2";
 import { FilterRail } from "./filter-rail";
 import { ActiveFilterBar } from "./active-filter-bar";
@@ -118,32 +118,39 @@ export function CatalogPageClient({ onOpenPalette }: CatalogPageClientProps) {
             onClearAll={onClearAll}
           />
 
-          {loading ? (
-            <CatalogGridSkeleton />
-          ) : results.length === 0 ? (
-            <CatalogEmpty onClear={onClearAll} />
-          ) : view === "grid" ? (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {results.map((s) => (
-                <SetCardV2
-                  key={s.id}
-                  id={s.id}
-                  name={s.name}
-                  theme={s.theme}
-                  year={s.year}
-                  status={s.status}
-                  imgUrl={s.imgUrl ?? undefined}
-                  msrp={s.msrp}
-                  currentValue={s.currentValue}
-                  pctChange={s.pctChange30d}
-                  sparkline={sparklineForSet(s, 45)}
-                  href={`/demo/sets/${s.id}`}
-                />
-              ))}
-            </div>
-          ) : (
-            <CatalogListView sets={results} />
-          )}
+          <Crossfade
+            ready={!loading}
+            skeleton={<CatalogGridSkeleton />}
+          >
+            {results.length === 0 ? (
+              <CatalogEmpty onClear={onClearAll} />
+            ) : view === "grid" ? (
+              <StaggerChildren
+                className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"
+                stagger={0.035}
+                distance={12}
+              >
+                {results.map((s) => (
+                  <SetCardV2
+                    key={s.id}
+                    id={s.id}
+                    name={s.name}
+                    theme={s.theme}
+                    year={s.year}
+                    status={s.status}
+                    imgUrl={s.imgUrl ?? undefined}
+                    msrp={s.msrp}
+                    currentValue={s.currentValue}
+                    pctChange={s.pctChange30d}
+                    sparkline={sparklineForSet(s, 45)}
+                    href={`/demo/sets/${s.id}`}
+                  />
+                ))}
+              </StaggerChildren>
+            ) : (
+              <CatalogListView sets={results} />
+            )}
+          </Crossfade>
         </div>
       </div>
     </div>

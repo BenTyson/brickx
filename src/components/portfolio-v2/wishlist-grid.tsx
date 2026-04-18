@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { Target, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { DeltaChip } from "@/components/ui/delta-chip";
+import { StaggerChildren } from "@/components/motion";
 import type { WishlistItem } from "@/lib/mock/portfolio";
 
 interface WishlistGridProps {
@@ -20,11 +21,14 @@ export function WishlistGrid({
 }: WishlistGridProps) {
   return (
     <section className={cn("flex flex-col gap-4", className)}>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <StaggerChildren
+        className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        stagger={0.04}
+      >
         {items.map((w) => (
           <WishlistCard key={w.set.id} item={w} hrefPrefix={setHrefPrefix} />
         ))}
-      </div>
+      </StaggerChildren>
     </section>
   );
 }
