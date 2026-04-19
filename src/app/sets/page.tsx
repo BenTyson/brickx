@@ -1,18 +1,19 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { PageContainer } from "@/components/page-container";
+import { CatalogPage } from "@/components/catalog/catalog-page";
+import { CatalogGridSkeleton } from "@/components/catalog/catalog-skeleton";
+import type { CatalogFiltersState } from "@/components/catalog/filter-rail";
+import type { CatalogView } from "@/components/catalog/catalog-toolbar";
 import {
   fetchCatalogSets,
   fetchFilterOptions,
   parseCatalogSearchParams,
 } from "@/lib/queries";
-import { CatalogSearch } from "@/components/catalog/catalog-search";
-import { CatalogSort } from "@/components/catalog/catalog-sort";
-import { CatalogFilters } from "@/components/catalog/catalog-filters";
-import { MobileFilterSheet } from "@/components/catalog/mobile-filter-sheet";
-import { CatalogGrid } from "@/components/catalog/catalog-grid";
-import { CatalogPagination } from "@/components/catalog/catalog-pagination";
-import { ActiveFilters } from "@/components/catalog/active-filters";
+import {
+  CATALOG_SORTS,
+  toCatalogSetView,
+  sortDescriptorFromUrl,
+} from "@/lib/view-models/catalog";
 
 export const metadata: Metadata = {
   title: "Browse LEGO Sets | BrickX",
@@ -26,81 +27,66 @@ export default async function SetsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const raw = await searchParams;
-  const params = parseCatalogSearchParams(raw);
+
+  // Sort: accept sort-key from the v2 toolbar (e.g. "trending") and map
+  // to CatalogSearchParams field/order; legacy ?sort=field still works.
+  const sortKey = typeof raw.sort === "string" ? raw.sort : undefined;
+  const descriptor = CATALOG_SORTS.find((s) => s.key === sortKey);
+  const paramsRaw: Record<string, string | string[] | undefined> = { ...raw };
+  if (descriptor) {
+    paramsRaw.sort = descriptor.field;
+    paramsRaw.order = descriptor.order;
+  }
+  const params = parseCatalogSearchParams(paramsRaw);
 
   const [result, filterOptions] = await Promise.all([
     fetchCatalogSets(params),
     fetchFilterOptions(),
   ]);
 
-  const hasFilters = Boolean(
-    params.q ||
-    params.theme?.length ||
-    params.status?.length ||
-    params.yearMin != null ||
-    params.yearMax != null ||
-    params.priceMin != null ||
-    params.priceMax != null,
-  );
+  const view: CatalogView =
+    raw.view === "list" ? "list" : "grid";
+
+  const filters: CatalogFiltersState = {
+    q: params.q,
+    statuses: params.status ?? [],
+    themeIds: params.theme ?? [],
+    yearMin: params.yearMin,
+    yearMax: params.yearMax,
+    priceMin: params.priceMin,
+    priceMax: params.priceMax,
+    partsMin: params.partsMin,
+    partsMax: params.partsMax,
+    sort:
+      sortDescriptorFromUrl(params.sort, params.order).key ??
+      CATALOG_SORTS[0].key,
+  };
+
+  const sets = result.sets.map(toCatalogSetView);
 
   return (
-    <div className="py-8">
-      <PageContainer>
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold tracking-tight">Browse Sets</h1>
-          <p className="text-muted-foreground mt-1">
-            {result.totalCount.toLocaleString()} sets available
-          </p>
-        </div>
+    <Suspense fallback={<SetsPageSkeleton />}>
+      <CatalogPage
+        sets={sets}
+        totalCount={result.totalCount}
+        page={result.page}
+        pageSize={result.pageSize}
+        totalPages={result.totalPages}
+        filters={filters}
+        view={view}
+        themeOptions={filterOptions.themes}
+        yearRange={[filterOptions.yearRange.min, filterOptions.yearRange.max]}
+        priceRange={[filterOptions.priceRange.min, filterOptions.priceRange.max]}
+        partsRange={[filterOptions.partsRange.min, filterOptions.partsRange.max]}
+      />
+    </Suspense>
+  );
+}
 
-        {/* Search + Sort bar */}
-        <Suspense>
-          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-1 items-center gap-3">
-              <div className="flex-1 sm:max-w-sm">
-                <CatalogSearch />
-              </div>
-              <MobileFilterSheet options={filterOptions} />
-            </div>
-            <CatalogSort />
-          </div>
-        </Suspense>
-
-        {/* Active filters */}
-        <Suspense>
-          <div className="mb-4">
-            <ActiveFilters options={filterOptions} />
-          </div>
-        </Suspense>
-
-        {/* Main layout: sidebar + grid */}
-        <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
-          {/* Sidebar (desktop only) */}
-          <aside className="hidden lg:block">
-            <Suspense>
-              <CatalogFilters options={filterOptions} />
-            </Suspense>
-          </aside>
-
-          {/* Grid + Pagination */}
-          <div className="space-y-8">
-            <CatalogGrid
-              sets={result.sets}
-              hasFilters={hasFilters}
-              onClearFilters="/sets"
-            />
-            <Suspense>
-              <CatalogPagination
-                currentPage={result.page}
-                totalPages={result.totalPages}
-                totalCount={result.totalCount}
-                pageSize={result.pageSize}
-              />
-            </Suspense>
-          </div>
-        </div>
-      </PageContainer>
+function SetsPageSkeleton() {
+  return (
+    <div className="mx-auto max-w-[1320px] px-6 pb-24 pt-10 sm:px-10 lg:px-14">
+      <CatalogGridSkeleton />
     </div>
   );
 }

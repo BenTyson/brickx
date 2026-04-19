@@ -3,36 +3,54 @@
 import { useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import {
-  CATALOG_STATUSES,
-  CATALOG_THEMES,
-  PARTS_RANGE,
-  PRICE_RANGE,
-  YEAR_RANGE,
-  type CatalogFilters,
-  type SetStatus,
-  type Theme,
-} from "@/lib/mock/catalog";
+import type { SetStatus } from "@/lib/types/database";
 import { DualRangeSlider } from "./dual-range-slider";
+
+export type CatalogFiltersState = {
+  q?: string;
+  statuses: SetStatus[];
+  themeIds: number[];
+  yearMin?: number;
+  yearMax?: number;
+  priceMin?: number;
+  priceMax?: number;
+  partsMin?: number;
+  partsMax?: number;
+  sort: string;
+};
+
+export interface ThemeOption {
+  id: number;
+  name: string;
+  count: number;
+}
 
 const STATUS_LABEL: Record<SetStatus, string> = {
   available: "Available",
   retired: "Retired",
-  "retiring-soon": "Retiring soon",
-  exclusive: "Exclusive",
   unreleased: "Unreleased",
 };
 
+const CATALOG_STATUSES: SetStatus[] = ["available", "retired", "unreleased"];
+
 interface FilterRailProps {
-  filters: CatalogFilters;
+  filters: CatalogFiltersState;
   resultCount: number;
-  onChange: (patch: Partial<CatalogFilters>) => void;
+  themeOptions: ThemeOption[];
+  yearRange: [number, number];
+  priceRange: [number, number];
+  partsRange: [number, number];
+  onChange: (patch: Partial<CatalogFiltersState>) => void;
   onClearAll: () => void;
 }
 
 export function FilterRail({
   filters,
   resultCount,
+  themeOptions,
+  yearRange,
+  priceRange,
+  partsRange,
   onChange,
   onClearAll,
 }: FilterRailProps) {
@@ -40,13 +58,13 @@ export function FilterRail({
 
   const themes = useMemo(() => {
     const q = themeQuery.trim().toLowerCase();
-    if (!q) return CATALOG_THEMES;
-    return CATALOG_THEMES.filter((t) => t.name.toLowerCase().includes(q));
-  }, [themeQuery]);
+    if (!q) return themeOptions;
+    return themeOptions.filter((t) => t.name.toLowerCase().includes(q));
+  }, [themeQuery, themeOptions]);
 
   const hasAny =
-    (filters.statuses.length ?? 0) +
-      (filters.themes.length ?? 0) +
+    filters.statuses.length +
+      filters.themeIds.length +
       (filters.q ? 1 : 0) +
       (filters.yearMin != null ? 1 : 0) +
       (filters.yearMax != null ? 1 : 0) +
@@ -57,16 +75,16 @@ export function FilterRail({
     0;
 
   const yearVal: [number, number] = [
-    filters.yearMin ?? YEAR_RANGE[0],
-    filters.yearMax ?? YEAR_RANGE[1],
+    filters.yearMin ?? yearRange[0],
+    filters.yearMax ?? yearRange[1],
   ];
   const priceVal: [number, number] = [
-    filters.priceMin ?? PRICE_RANGE[0],
-    filters.priceMax ?? PRICE_RANGE[1],
+    filters.priceMin ?? priceRange[0],
+    filters.priceMax ?? priceRange[1],
   ];
   const partsVal: [number, number] = [
-    filters.partsMin ?? PARTS_RANGE[0],
-    filters.partsMax ?? PARTS_RANGE[1],
+    filters.partsMin ?? partsRange[0],
+    filters.partsMax ?? partsRange[1],
   ];
 
   return (
@@ -137,14 +155,14 @@ export function FilterRail({
         <ul className="flex max-h-56 flex-col gap-0.5 overflow-y-auto pr-1">
           {themes.map((t) => (
             <ThemeRow
-              key={t.slug}
+              key={t.id}
               theme={t}
-              active={filters.themes.includes(t.slug)}
+              active={filters.themeIds.includes(t.id)}
               onToggle={() =>
                 onChange({
-                  themes: filters.themes.includes(t.slug)
-                    ? filters.themes.filter((x) => x !== t.slug)
-                    : [...filters.themes, t.slug],
+                  themeIds: filters.themeIds.includes(t.id)
+                    ? filters.themeIds.filter((x) => x !== t.id)
+                    : [...filters.themeIds, t.id],
                 })
               }
             />
@@ -159,13 +177,13 @@ export function FilterRail({
 
       <Section title="Year">
         <DualRangeSlider
-          min={YEAR_RANGE[0]}
-          max={YEAR_RANGE[1]}
+          min={yearRange[0]}
+          max={yearRange[1]}
           value={yearVal}
           onChange={([lo, hi]) =>
             onChange({
-              yearMin: lo === YEAR_RANGE[0] ? undefined : lo,
-              yearMax: hi === YEAR_RANGE[1] ? undefined : hi,
+              yearMin: lo === yearRange[0] ? undefined : lo,
+              yearMax: hi === yearRange[1] ? undefined : hi,
             })
           }
           format={(n) => String(n)}
@@ -174,34 +192,34 @@ export function FilterRail({
         />
       </Section>
 
-      <Section title="Market value">
+      <Section title="MSRP">
         <DualRangeSlider
-          min={PRICE_RANGE[0]}
-          max={PRICE_RANGE[1]}
+          min={priceRange[0]}
+          max={priceRange[1]}
           step={10}
           value={priceVal}
           onChange={([lo, hi]) =>
             onChange({
-              priceMin: lo === PRICE_RANGE[0] ? undefined : lo,
-              priceMax: hi === PRICE_RANGE[1] ? undefined : hi,
+              priceMin: lo === priceRange[0] ? undefined : lo,
+              priceMax: hi === priceRange[1] ? undefined : hi,
             })
           }
           format={(n) => `$${n.toLocaleString()}`}
-          ariaLabelLow="Minimum price"
-          ariaLabelHigh="Maximum price"
+          ariaLabelLow="Minimum MSRP"
+          ariaLabelHigh="Maximum MSRP"
         />
       </Section>
 
       <Section title="Piece count">
         <DualRangeSlider
-          min={PARTS_RANGE[0]}
-          max={PARTS_RANGE[1]}
+          min={partsRange[0]}
+          max={partsRange[1]}
           step={100}
           value={partsVal}
           onChange={([lo, hi]) =>
             onChange({
-              partsMin: lo === PARTS_RANGE[0] ? undefined : lo,
-              partsMax: hi === PARTS_RANGE[1] ? undefined : hi,
+              partsMin: lo === partsRange[0] ? undefined : lo,
+              partsMax: hi === partsRange[1] ? undefined : hi,
             })
           }
           format={(n) => (n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n))}
@@ -235,7 +253,7 @@ function ThemeRow({
   active,
   onToggle,
 }: {
-  theme: Theme;
+  theme: ThemeOption;
   active: boolean;
   onToggle: () => void;
 }) {
@@ -278,14 +296,13 @@ function ThemeRow({
           <span className="truncate">{theme.name}</span>
         </span>
         <span className="text-micro font-mono font-tabular text-text-tertiary">
-          {theme.setCount}
+          {theme.count.toLocaleString()}
         </span>
       </button>
     </li>
   );
 }
 
-/** Inline pill used by active-filter bar to clear an individual chip. */
 export function FilterChipClear() {
   return <X className="size-3" />;
 }

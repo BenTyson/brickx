@@ -5,13 +5,14 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { ScrollReveal } from "@/components/motion";
 import { SetCardV2 } from "@/components/ui/set-card-v2";
 import type { SeriesPoint } from "@/lib/mock/series";
+import type { SetStatus } from "@/lib/types/database";
 
 type FeaturedSet = {
   id: string;
   name: string;
   theme: string;
   year: number;
-  status: "available" | "retired" | "retiring-soon" | "exclusive" | "unreleased";
+  status: SetStatus;
   msrp: number;
   current: number;
   delta: number;

@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Package, Puzzle, Users } from "lucide-react";
-import { PageContainer } from "@/components/page-container";
-import { StatusBadge } from "@/components/status-badge";
-import { Separator } from "@/components/ui/separator";
 import { SetDetailBreadcrumb } from "@/components/detail/set-detail-breadcrumb";
-import { MarketStatsGrid } from "@/components/detail/market-stats-grid";
-import { PriceChart } from "@/components/detail/price-chart";
-import { RelatedSets } from "@/components/detail/related-sets";
-import { AddToCollectionButton } from "@/components/detail/add-to-collection-button";
-import { CreateAlertDialog } from "@/components/alerts/create-alert-dialog";
+import { SetImageGallery } from "@/components/detail/set-image-gallery";
+import { SetInfoHeader } from "@/components/detail/set-info-header";
+import { KeyStatsStrip } from "@/components/detail/key-stats-strip";
+import { PriceHistoryChart } from "@/components/detail/price-history-chart";
+import { FundamentalsGrid } from "@/components/detail/fundamentals-grid";
+import { MethodologyDisclosure } from "@/components/detail/methodology-disclosure";
+import { RelatedCarousel } from "@/components/detail/related-carousel";
+import { StickyActionsRail } from "@/components/detail/sticky-actions-rail";
 import { JsonLd } from "@/components/json-ld";
 import {
   fetchSetDetail,
@@ -18,6 +16,9 @@ import {
   fetchRelatedSets,
 } from "@/lib/queries";
 import { createClient } from "@/lib/supabase/server";
+import { toCatalogSetView } from "@/lib/view-models/catalog";
+import { slugify } from "@/lib/utils/slug";
+import type { PriceHistoryPoint } from "@/lib/types/catalog";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://brickx.io";
 
@@ -44,10 +45,7 @@ export async function generateMetadata({
 export default async function SetDetailPage({ params }: SetDetailPageProps) {
   const { id } = await params;
   const set = await fetchSetDetail(id);
-
-  if (!set) {
-    notFound();
-  }
+  if (!set) notFound();
 
   const supabase = await createClient();
   const {
@@ -58,6 +56,17 @@ export default async function SetDetailPage({ params }: SetDetailPageProps) {
     fetchPriceHistory(id),
     set.theme_id ? fetchRelatedSets(set.theme_id, id) : Promise.resolve([]),
   ]);
+
+  const marketValue = set.market_value_new ?? set.msrp_usd ?? 0;
+  const delta30d = set.pct_change_30d ?? 0;
+  const delta1y = set.growth_annual_pct;
+  const msrp = set.msrp_usd ?? 0;
+  const themeSlug = set.theme_name ? slugify(set.theme_name) : null;
+
+  const images = [{ url: set.img_url, alt: set.name }];
+
+  const keyStats = buildKeyStats(set.market_value_new, priceHistory, set.pct_change_90d, set.investment_score);
+  const fundamentals = buildFundamentals(set);
 
   const productJsonLd = {
     "@context": "https://schema.org",
@@ -80,144 +89,117 @@ export default async function SetDetailPage({ params }: SetDetailPageProps) {
   };
 
   return (
-    <div className="py-8">
+    <main className="bg-bg-base pb-32 lg:pb-16">
       <JsonLd data={productJsonLd} />
-      <PageContainer className="space-y-8">
-        {/* Breadcrumb */}
-        <SetDetailBreadcrumb setName={set.name} />
+      <div className="mx-auto max-w-[1320px] px-6 pb-10 pt-8 sm:px-10 lg:px-14">
+        <SetDetailBreadcrumb
+          themeName={set.theme_name}
+          themeSlug={themeSlug}
+          setName={set.name}
+        />
+      </div>
 
-        {/* Hero: Image + Info */}
-        <div className="grid gap-8 lg:grid-cols-[400px_1fr]">
-          {/* Image */}
-          <div className="flex items-start justify-center">
-            {set.img_url ? (
-              <div className="relative aspect-square w-full max-w-[400px] overflow-hidden rounded-xl">
-                <Image
-                  src={set.img_url}
-                  alt={set.name}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 400px"
-                  className="object-contain"
-                  priority
-                />
-              </div>
-            ) : (
-              <div className="bg-muted flex aspect-square w-full max-w-[400px] items-center justify-center rounded-xl">
-                <Package className="text-muted-foreground/50 size-24" />
-              </div>
-            )}
+      <div className="mx-auto grid max-w-[1320px] gap-10 px-6 sm:px-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-14">
+        <div className="space-y-12">
+          <section className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]">
+            <SetImageGallery images={images} setName={set.name} />
+            <SetInfoHeader
+              setId={set.id}
+              name={set.name}
+              theme={set.theme_name ?? "Unknown"}
+              year={set.year}
+              status={set.status}
+              marketValue={marketValue}
+              msrp={msrp}
+              delta30d={delta30d}
+              delta1y={delta1y}
+            />
+          </section>
+
+          <KeyStatsStrip stats={keyStats} />
+
+          <PriceHistoryChart priceHistory={priceHistory} />
+
+          <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
+            <FundamentalsGrid fundamentals={fundamentals} />
+            <MethodologyDisclosure />
           </div>
 
-          {/* Info Panel */}
-          <div className="space-y-4">
-            <div>
-              <div className="mb-2 flex items-center gap-3">
-                <StatusBadge status={set.status} />
-              </div>
-              <h1 className="text-3xl font-bold tracking-tight lg:text-4xl">
-                {set.name}
-              </h1>
-              <p className="text-muted-foreground mt-1 text-lg">Set {set.id}</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-              {set.theme_name && (
-                <div>
-                  <p className="text-muted-foreground text-sm">Theme</p>
-                  <p className="font-medium">{set.theme_name}</p>
-                </div>
-              )}
-              <div>
-                <p className="text-muted-foreground text-sm">Year</p>
-                <p className="font-medium">{set.year}</p>
-              </div>
-              {set.msrp_usd != null && (
-                <div>
-                  <p className="text-muted-foreground text-sm">MSRP</p>
-                  <p className="font-medium">${set.msrp_usd.toFixed(2)}</p>
-                </div>
-              )}
-              {set.num_parts != null && (
-                <div className="flex items-center gap-2">
-                  <Puzzle
-                    className="text-muted-foreground size-4"
-                    aria-hidden="true"
-                  />
-                  <div>
-                    <p className="text-muted-foreground text-sm">Parts</p>
-                    <p className="font-medium">
-                      {set.num_parts.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
-              )}
-              {set.num_minifigs != null && (
-                <div className="flex items-center gap-2">
-                  <Users
-                    className="text-muted-foreground size-4"
-                    aria-hidden="true"
-                  />
-                  <div>
-                    <p className="text-muted-foreground text-sm">Minifigs</p>
-                    <p className="font-medium">{set.num_minifigs}</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Market value highlight */}
-            {set.market_value_new != null && (
-              <div className="bg-card rounded-lg border p-4">
-                <p className="text-muted-foreground text-sm">
-                  Current Market Value (New)
-                </p>
-                <p className="text-3xl font-bold tracking-tight">
-                  ${set.market_value_new.toFixed(2)}
-                </p>
-                {set.msrp_usd != null && set.msrp_usd > 0 && (
-                  <p className="text-muted-foreground mt-1 text-sm">
-                    {(
-                      ((set.market_value_new - set.msrp_usd) / set.msrp_usd) *
-                      100
-                    ).toFixed(1)}
-                    % vs MSRP
-                  </p>
-                )}
-              </div>
-            )}
-
-            <div className="flex flex-wrap gap-2">
-              <AddToCollectionButton
-                setId={set.id}
-                setName={set.name}
-                userId={user?.id ?? null}
-              />
-              {user && <CreateAlertDialog setId={set.id} setName={set.name} />}
-            </div>
-          </div>
+          {relatedSets.length > 0 && set.theme_name && themeSlug && (
+            <RelatedCarousel
+              themeName={set.theme_name}
+              themeSlug={themeSlug}
+              sets={relatedSets.map(toCatalogSetView)}
+            />
+          )}
         </div>
 
-        {/* Market Stats */}
-        <Separator />
-        <div>
-          <h2 className="mb-4 text-2xl font-bold tracking-tight">
-            Market Statistics
-          </h2>
-          <MarketStatsGrid set={set} />
-        </div>
-
-        {/* Price Chart */}
-        <Separator />
-        <PriceChart data={priceHistory} />
-
-        {/* Related Sets */}
-        {relatedSets.length > 0 && (
-          <>
-            <Separator />
-            <RelatedSets sets={relatedSets} />
-          </>
-        )}
-      </PageContainer>
-    </div>
+        <StickyActionsRail
+          setId={set.id}
+          setName={set.name}
+          marketValue={marketValue}
+          delta30d={delta30d}
+          userId={user?.id ?? null}
+        />
+      </div>
+    </main>
   );
+}
+
+function buildKeyStats(
+  marketValueNew: number | null,
+  priceHistory: PriceHistoryPoint[],
+  pctChange90d: number | null,
+  investmentScore: number | null,
+) {
+  // 30d high/low from any source with new_avg data
+  const cutoff = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const recent = priceHistory.filter(
+    (p) => new Date(p.date).getTime() >= cutoff && p.new_avg != null,
+  );
+  let high30d: number | null = null;
+  let low30d: number | null = null;
+  if (recent.length > 0) {
+    const vals = recent.map((p) => p.new_avg as number);
+    high30d = Math.max(...vals);
+    low30d = Math.min(...vals);
+  }
+  return {
+    lastSale: marketValueNew,
+    high30d,
+    low30d,
+    pctChange90d,
+    investmentScore,
+  };
+}
+
+function buildFundamentals(set: {
+  msrp_usd: number | null;
+  num_parts: number | null;
+  num_minifigs: number | null;
+  market_value_new: number | null;
+  year: number;
+  status: "available" | "retired" | "unreleased";
+}) {
+  const msrp = set.msrp_usd ?? 0;
+  const parts = set.num_parts ?? 0;
+  const minifigs = set.num_minifigs ?? 0;
+  const current = set.market_value_new ?? msrp;
+  const today = new Date();
+  const yearsSince = Math.max(today.getFullYear() - set.year, 0.1);
+  const cagr =
+    msrp > 0 && current > 0
+      ? (Math.pow(current / msrp, 1 / yearsSince) - 1) * 100
+      : null;
+  return {
+    msrp,
+    parts,
+    minifigs,
+    pricePerPart: parts > 0 ? current / parts : 0,
+    msrpPerPart: parts > 0 ? msrp / parts : 0,
+    cagr,
+    yearsSinceRelease: yearsSince,
+    projectedRetirement:
+      set.status === "available" ? `${set.year + 4}` : null,
+  };
 }

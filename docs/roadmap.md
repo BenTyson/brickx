@@ -293,19 +293,21 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 - Delete `/demo/sets/*`, `/demo/themes/*`
 - `npm run build` + smoke test: filter, sort, open set, add to collection, create alert
 
-### Session D8b-3 — Portfolio + Market migration + final demo cleanup
+### Session D8b-3 — Portfolio + Market migration (keep /app/demo/ as workbench)
 **Model:** Opus 4.7 — auth-gated, data-heavy. Portfolio v2 is a full redesign consuming mock holdings/indices; must wire to `fetchPortfolioSummary` + `fetchPortfolioHistory` (F2).
-**Goal:** Migrate `/portfolio`, `/collections/[id]`, `/market/*` to v2; delete `/app/demo/*` in full.
+**Goal:** Migrate `/portfolio`, `/collections/[id]`, `/market/*` to v2 while preserving `/app/demo/*` as a living reference.
 
-- **Portfolio:** wire v2 hero/holdings-table/allocation-donut/treemap/top-movers to real collections data. Empty-portfolio component becomes real onboarding nudge. Replace hardcoded `/demo/` hrefs.
+**Scope note (decided post-D8b-2):** `/app/demo/*` is preserved indefinitely as the v2 design-system workbench — don't delete it. This is a deliberate choice to keep a mock-data showcase available for iterating on new surfaces.
+
+- **Portfolio:** wire v2 hero/holdings-table/allocation-donut/treemap/top-movers to real collections data. Empty-portfolio component becomes real onboarding nudge. Hardcoded `/demo/sets/…` hrefs need a per-context `hrefPrefix` prop (pattern already used in `holdings-table.tsx`) so live pages pass `/sets/` and demo pages keep passing `/demo/sets/`.
 - **Market:** wire v2 index-hero, trending/retiring/new-releases tables to real market queries. News feed stays mocked (deferred to Phase C).
 - **Collections detail:** apply v2 language (v2 has no separate collection-detail; reuse portfolio primitives scoped to one collection).
 - **Wishlist:** embedded in portfolio-v2; port alongside.
-- Rename `portfolio-v2/` → `portfolio/`, `market-v2/` → `market/` after legacy deleted
-- Delete `src/app/demo/` entirely; remove `/demo/*` from sitemap/robots if referenced
-- `npm run build` + Lighthouse on migrated pages; full live smoke test (sign in, portfolio, collections, market)
+- **Do NOT rename** `portfolio-v2/` / `market-v2/` / `mock/*` — demo pages still import them. Live routes import from `-v2/` directly. (Alternative: duplicate needed components into canonical `portfolio/` and `market/` and leave `-v2/` for demo only. Either works; pick the cheaper one.)
+- **Do NOT delete** `src/app/demo/*` or `src/lib/mock/*`. Keep `src/app/demo/layout.tsx`, mock data, and the -v2 components backing the demo pages intact.
+- `npm run build` + Lighthouse on migrated live pages; smoke test both a live flow and a `/demo/*` page to verify the demo workbench still renders.
 
-**Files across D8b-1/2/3:** rename `src/components/*-v2/` → canonical paths, delete legacy components under `src/components/{landing,sets,portfolio,market,catalog,...}/`, delete `src/app/demo/*`.
+**Files across D8b-1/2/3:** D8b-1 deleted legacy landing + `/demo/{tokens,components,landing}`. D8b-2 deleted legacy catalog/detail and renamed catalog-v2/set-detail-v2 → canonical; also deleted `/demo/sets` and `/demo/themes`. D8b-3 stops there — remaining `/demo/*` routes (portfolio, market, collections, wishlist) stay as the workbench.
 
 ## Session D9 — Mobile polish + auth pages + empty/loading states + a11y
 **Model:** Sonnet 4.6 — many small surfaces (mobile nav, auth pages, empty states, skeletons, a11y fixes); pattern-driven once D2 primitives are reused.
@@ -529,7 +531,7 @@ Design and functionality alternate so neither track blocks the other. Total: **1
 | 12 | **D8a** — Motion pass across /demo/* | Design | Opus 4.7 | Make demos feel shipped; no live-route risk |
 | 13a | **D8b-1** — Landing migration + showcase cleanup | Design | Opus 4.7 | First live-route swap; sets pattern for rest |
 | 13b | **D8b-2** — Catalog + Set detail migration | Design | Opus 4.7 | Highest-complexity pair; real-data rewiring |
-| 13c | **D8b-3** — Portfolio + Market migration + final demo cleanup | Design | Opus 4.7 | Auth-gated data-heavy; delete `/app/demo/*` |
+| 13c | **D8b-3** — Portfolio + Market migration (keep /demo workbench) | Design | Opus 4.7 | Auth-gated data-heavy; preserves `/app/demo/*` as v2 reference |
 | 14 | **D9** — Mobile + auth + empty/loading + a11y | Design | Sonnet 4.6 | Every surface polished |
 | 15 | **D10** — Brand voice + OG images + final polish | Design | Opus 4.7 | Launch-readiness visuals |
 | 16 | **F5** — Production infrastructure | Func | Sonnet 4.6 | Sentry, PostHog, rate limiting, CSP, CI, deploy |

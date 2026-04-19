@@ -38,6 +38,8 @@ export interface CatalogSearchParams {
   yearMax?: number;
   priceMin?: number;
   priceMax?: number;
+  partsMin?: number;
+  partsMax?: number;
   status?: SetStatus[];
   sort?: CatalogSortField;
   order?: "asc" | "desc";
@@ -65,5 +67,6 @@ export interface CatalogFilterOptions {
   themes: { id: number; name: string; count: number }[];
   yearRange: { min: number; max: number };
   priceRange: { min: number; max: number };
+  partsRange: { min: number; max: number };
   statusCounts: { status: SetStatus; count: number }[];
 }
