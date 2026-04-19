@@ -25,17 +25,17 @@ export function FinalCTA() {
           </p>
           <div className="mt-12 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/demo/components"
+              href="/sign-up"
               className="inline-flex items-center gap-2 rounded-full bg-brand-gradient px-6 py-3.5 text-body font-medium text-accent-foreground shadow-[0_12px_40px_-12px_color-mix(in_oklab,var(--accent)_60%,transparent)] transition hover:brightness-110"
             >
               Start your portfolio
               <ArrowUpRight className="size-4" strokeWidth={2.4} />
             </Link>
             <Link
-              href="/demo/tokens"
+              href="/sets"
               className="inline-flex items-center gap-2 rounded-full border border-border-emphasis bg-bg-raised/80 px-6 py-3.5 text-body text-text-secondary transition hover:bg-bg-overlay hover:text-text-primary"
             >
-              See the system
+              Browse sets
             </Link>
           </div>
         </ScrollReveal>
