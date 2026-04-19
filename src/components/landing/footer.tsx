@@ -4,11 +4,11 @@ const columns: Array<{ heading: string; links: Array<{ label: string; href: stri
   {
     heading: "Product",
     links: [
-      { label: "Catalog", href: "#" },
-      { label: "Portfolio", href: "#" },
-      { label: "Market intelligence", href: "#" },
-      { label: "Alerts", href: "#" },
-      { label: "BrickX 100", href: "#" },
+      { label: "Catalog", href: "/sets" },
+      { label: "Portfolio", href: "/portfolio" },
+      { label: "Market intelligence", href: "/market" },
+      { label: "Alerts", href: "/alerts" },
+      { label: "BrickX 100", href: "/market" },
     ],
   },
   {
@@ -89,7 +89,7 @@ export function LandingFooter() {
 
         <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-border-thin pt-6">
           <span className="text-micro font-mono font-tabular text-text-quaternary">
-            © {new Date().getFullYear()} BrickX · Demo surface · Not production
+            © {new Date().getFullYear()} BrickX. All rights reserved.
           </span>
           <div className="flex gap-4">
             {["Twitter", "GitHub", "Discord"].map((s) => (

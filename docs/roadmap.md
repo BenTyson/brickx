@@ -268,18 +268,44 @@ The user wants two parallel tracks of multi-session work, each session sized to 
 
 **Files:** `src/components/motion/*` (new page-transition + toast + button primitives), wiring across `src/components/*-v2/*` and `src/app/demo/*`.
 
-## Session D8b — Migration to production
-**Model:** Opus 4.7 — destructive cross-cutting refactor that touches every live page; deletes old components and rewires imports. Mistakes regress shipped surfaces.
-**Goal:** Move polished components into live routes; retire /demo/*.
+## Session D8b — Migration to production (split into D8b-1/2/3)
 
-- Component-by-component migration: replace imports from legacy paths with `-v2` equivalents; rename from `-v2` suffix back to canonical names once the live route uses them
-- Delete old component versions and delete `/app/demo/*` routes once migration verified per family
-- One commit per major component family (landing, catalog, set detail, portfolio, market, themes)
-- Live-route smoke test after each family: sign in, add to collection, create alert, view portfolio chart — no regressions
-- `npm run build` + Lighthouse audit per migrated page; fix regressions
-- Update any internal links (nav, footer, CTAs) that still point at `/demo/*`
+**Split rationale (recorded mid-D8b-1):** The audit revealed that v2 components consume mock data shapes, not live DB shapes; hardcoded `/demo/` hrefs are scattered through v2 code; and catalog-v2 is client-side while legacy catalog is server-rendered. Six families × real-data rewiring × per-family smoke tests is not one session. Split into three smaller, shippable sessions:
 
-**Files:** rename `src/components/*-v2/` → canonical paths, delete legacy components under `src/components/{landing,sets,portfolio,...}/`, delete `src/app/demo/*`.
+### Session D8b-1 — Landing migration + showcase cleanup
+**Model:** Opus 4.7 — low real-data risk (landing uses mocks in both versions for ticker/featured) but still the first live-route swap; sets the pattern for D8b-2/3.
+**Goal:** Replace live home page with v2 landing; delete pure showcase demo routes.
+
+- Migrate `src/app/page.tsx` to use `landing-v2/*` components; preserve skip-to-content link
+- Rename `src/components/landing-v2/` → `src/components/landing/` (delete legacy landing first)
+- Decide: keep `src/lib/mock/series.ts` + landing mock data co-located with page, or extract. Landing is inherently marketing-mocked; OK to keep.
+- Delete `src/app/demo/landing/`, `src/app/demo/tokens/`, `src/app/demo/components/` (pure showcase — no live equivalent to migrate)
+- Audit `/demo/*` links in live code (site-header, site-footer, nav, CTAs); fix any that leaked in
+- `npm run build` green; smoke test `/` renders
+
+### Session D8b-2 — Catalog + Set detail migration
+**Model:** Opus 4.7 — highest-complexity pair. Catalog v2 is client-side vs legacy server-rendered (architectural decision needed). Set detail v2 has richer components but mock-only data flow (must rewire to real queries).
+**Goal:** Migrate `/sets`, `/themes`, `/sets/[id]` to v2 visuals while preserving server-rendered data fetching and real feature wiring (add-to-collection, alerts).
+
+- **Catalog:** decide paradigm — adopt v2 visuals into existing server-rendered flow (recommended) vs switch to client-side v2 (loses URL-synced filters + SSR SEO). Recommended: port v2 filter rail / list view / theme cards into legacy server-rendered catalog.
+- **Set detail:** rewire v2 components to accept real set + price data shapes. Replace hardcoded `/demo/sets/X` hrefs with dynamic `/sets/[id]`. Preserve add-to-collection, alert creation, breadcrumb logic.
+- Rename `catalog-v2/` → `catalog/`, `set-detail-v2/` → `detail/` (or canonical names) after legacy deleted
+- Delete `/demo/sets/*`, `/demo/themes/*`
+- `npm run build` + smoke test: filter, sort, open set, add to collection, create alert
+
+### Session D8b-3 — Portfolio + Market migration + final demo cleanup
+**Model:** Opus 4.7 — auth-gated, data-heavy. Portfolio v2 is a full redesign consuming mock holdings/indices; must wire to `fetchPortfolioSummary` + `fetchPortfolioHistory` (F2).
+**Goal:** Migrate `/portfolio`, `/collections/[id]`, `/market/*` to v2; delete `/app/demo/*` in full.
+
+- **Portfolio:** wire v2 hero/holdings-table/allocation-donut/treemap/top-movers to real collections data. Empty-portfolio component becomes real onboarding nudge. Replace hardcoded `/demo/` hrefs.
+- **Market:** wire v2 index-hero, trending/retiring/new-releases tables to real market queries. News feed stays mocked (deferred to Phase C).
+- **Collections detail:** apply v2 language (v2 has no separate collection-detail; reuse portfolio primitives scoped to one collection).
+- **Wishlist:** embedded in portfolio-v2; port alongside.
+- Rename `portfolio-v2/` → `portfolio/`, `market-v2/` → `market/` after legacy deleted
+- Delete `src/app/demo/` entirely; remove `/demo/*` from sitemap/robots if referenced
+- `npm run build` + Lighthouse on migrated pages; full live smoke test (sign in, portfolio, collections, market)
+
+**Files across D8b-1/2/3:** rename `src/components/*-v2/` → canonical paths, delete legacy components under `src/components/{landing,sets,portfolio,market,catalog,...}/`, delete `src/app/demo/*`.
 
 ## Session D9 — Mobile polish + auth pages + empty/loading states + a11y
 **Model:** Sonnet 4.6 — many small surfaces (mobile nav, auth pages, empty states, skeletons, a11y fixes); pattern-driven once D2 primitives are reused.
@@ -501,7 +527,9 @@ Design and functionality alternate so neither track blocks the other. Total: **1
 | 10 | **D7** — Market intelligence + named indices | Design | Sonnet 4.6 | Differentiator pages |
 | 11 | **F4** — Admin / Superadmin console | Func | Sonnet 4.6 | Required before wider launch for ops |
 | 12 | **D8a** — Motion pass across /demo/* | Design | Opus 4.7 | Make demos feel shipped; no live-route risk |
-| 13 | **D8b** — Migration to production | Design | Opus 4.7 | Move `/demo/*` into live routes; delete legacy |
+| 13a | **D8b-1** — Landing migration + showcase cleanup | Design | Opus 4.7 | First live-route swap; sets pattern for rest |
+| 13b | **D8b-2** — Catalog + Set detail migration | Design | Opus 4.7 | Highest-complexity pair; real-data rewiring |
+| 13c | **D8b-3** — Portfolio + Market migration + final demo cleanup | Design | Opus 4.7 | Auth-gated data-heavy; delete `/app/demo/*` |
 | 14 | **D9** — Mobile + auth + empty/loading + a11y | Design | Sonnet 4.6 | Every surface polished |
 | 15 | **D10** — Brand voice + OG images + final polish | Design | Opus 4.7 | Launch-readiness visuals |
 | 16 | **F5** — Production infrastructure | Func | Sonnet 4.6 | Sentry, PostHog, rate limiting, CSP, CI, deploy |

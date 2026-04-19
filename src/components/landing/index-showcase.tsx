@@ -40,7 +40,7 @@ export function IndexShowcase({ cards }: { cards: IndexCard[] }) {
             </p>
           </div>
           <Link
-            href="/demo/components"
+            href="/market"
             className="hidden shrink-0 items-center gap-1 text-small text-text-tertiary transition hover:text-text-primary md:inline-flex"
           >
             Explore indices

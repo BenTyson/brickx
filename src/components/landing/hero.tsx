@@ -49,7 +49,7 @@ export function Hero() {
         <SlideUp delay={0.28}>
           <div className="mt-10 flex flex-wrap items-center gap-3">
             <Link
-              href="/demo/components"
+              href="/sign-up"
               className="inline-flex items-center gap-2 rounded-full bg-brand-gradient px-5 py-3 text-small font-medium text-accent-foreground shadow-[0_12px_40px_-12px_color-mix(in_oklab,var(--accent)_60%,transparent)] transition hover:brightness-110"
             >
               Open a portfolio
