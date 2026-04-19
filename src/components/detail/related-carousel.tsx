@@ -4,15 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRef } from "react";
 import { ArrowLeft, ArrowRight, Package } from "lucide-react";
-import { Sparkline } from "@/components/charts/sparkline";
 import { DeltaChip } from "@/components/ui/delta-chip";
 import { cn } from "@/lib/utils/cn";
-import type { RelatedSet } from "@/lib/mock/set-detail";
+import type { CatalogSetView } from "@/lib/view-models/catalog";
 
 interface RelatedCarouselProps {
   themeName: string;
   themeSlug: string;
-  sets: RelatedSet[];
+  sets: CatalogSetView[];
 }
 
 export function RelatedCarousel({
@@ -49,7 +48,7 @@ export function RelatedCarousel({
         </div>
         <div className="flex items-center gap-2">
           <Link
-            href={`/demo/themes/${themeSlug}`}
+            href={`/themes/${themeSlug}`}
             className="text-small text-text-secondary transition hover:text-text-primary"
           >
             View theme →
@@ -72,7 +71,7 @@ export function RelatedCarousel({
         {sets.map((s) => (
           <Link
             key={s.id}
-            href={`/demo/sets/${s.id}`}
+            href={`/sets/${s.id}`}
             className="group relative flex w-[260px] shrink-0 snap-start flex-col overflow-hidden rounded-xl border border-border-thin bg-bg-raised transition hover:border-border-emphasis"
           >
             <div className="relative aspect-[4/3] overflow-hidden bg-bg-overlay">
@@ -89,15 +88,6 @@ export function RelatedCarousel({
                   <Package className="size-10 text-text-quaternary" />
                 </div>
               )}
-              <div className="absolute inset-x-0 bottom-0 h-10">
-                <Sparkline
-                  data={s.sparkline}
-                  width={260}
-                  height={40}
-                  className="h-10 w-full"
-                  showEndDot={false}
-                />
-              </div>
             </div>
             <div className="flex flex-1 flex-col gap-3 p-4">
               <div>
@@ -110,7 +100,7 @@ export function RelatedCarousel({
               </div>
               <div className="mt-auto flex items-end justify-between gap-2">
                 <div className="font-mono font-tabular tabular-nums text-text-primary">
-                  ${s.currentValue.toFixed(0)}
+                  {s.currentValue > 0 ? `$${s.currentValue.toFixed(0)}` : "—"}
                 </div>
                 <DeltaChip value={s.pctChange30d} size="sm" hideIcon />
               </div>

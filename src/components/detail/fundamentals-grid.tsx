@@ -1,6 +1,16 @@
 import { Coins, LineChart, Puzzle, Sparkles, Tag, Users } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
-import type { SetDetailFundamentals } from "@/lib/mock/set-detail";
+
+export interface SetDetailFundamentals {
+  msrp: number;
+  parts: number;
+  minifigs: number;
+  pricePerPart: number;
+  msrpPerPart: number;
+  cagr: number | null;
+  yearsSinceRelease: number;
+  projectedRetirement: string | null;
+}
 
 interface FundamentalsGridProps {
   fundamentals: SetDetailFundamentals;
@@ -19,29 +29,34 @@ export function FundamentalsGrid({
   className,
 }: FundamentalsGridProps) {
   const cells: Cell[] = [
-    { icon: Tag, label: "MSRP", value: `$${f.msrp.toFixed(0)}`, hint: "release price" },
+    {
+      icon: Tag,
+      label: "MSRP",
+      value: f.msrp > 0 ? `$${f.msrp.toFixed(0)}` : "—",
+      hint: "release price",
+    },
     {
       icon: Puzzle,
       label: "Parts",
-      value: f.parts.toLocaleString(),
+      value: f.parts > 0 ? f.parts.toLocaleString() : "—",
       hint: f.parts > 0 ? `$${f.pricePerPart.toFixed(2)}/part now` : undefined,
     },
     {
       icon: Users,
       label: "Minifigs",
-      value: f.minifigs.toString(),
+      value: f.minifigs >= 0 ? f.minifigs.toString() : "—",
     },
     {
       icon: Coins,
       label: "MSRP $/part",
-      value: f.parts > 0 ? `$${f.msrpPerPart.toFixed(3)}` : "—",
+      value: f.parts > 0 && f.msrp > 0 ? `$${f.msrpPerPart.toFixed(3)}` : "—",
       hint: "at release",
     },
     {
       icon: LineChart,
       label: "CAGR",
-      value: `${f.cagr.toFixed(1)}%`,
-      hint: `${f.yearsSinceRelease}y since release`,
+      value: f.cagr != null ? `${f.cagr.toFixed(1)}%` : "—",
+      hint: `${f.yearsSinceRelease.toFixed(1)}y since release`,
     },
     {
       icon: Sparkles,

@@ -26,9 +26,16 @@ import type { AlertType } from "@/lib/types/database";
 interface CreateAlertDialogProps {
   setId: string;
   setName: string;
+  triggerClassName?: string;
+  triggerLabel?: React.ReactNode;
 }
 
-export function CreateAlertDialog({ setId, setName }: CreateAlertDialogProps) {
+export function CreateAlertDialog({
+  setId,
+  setName,
+  triggerClassName,
+  triggerLabel,
+}: CreateAlertDialogProps) {
   const [open, setOpen] = useState(false);
   const [alertType, setAlertType] = useState<AlertType>("price_drop");
   const [targetPrice, setTargetPrice] = useState("");
@@ -61,10 +68,16 @@ export function CreateAlertDialog({ setId, setName }: CreateAlertDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Bell className="size-4" />
-          Set Alert
-        </Button>
+        {triggerLabel ? (
+          <button type="button" className={triggerClassName}>
+            {triggerLabel}
+          </button>
+        ) : (
+          <Button variant="outline" size="sm">
+            <Bell className="size-4" />
+            Set Alert
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

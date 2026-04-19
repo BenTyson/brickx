@@ -98,12 +98,12 @@ const indexCards = [
 const featuredSets = [
   { id: "10294", name: "Titanic", theme: "Creator Expert", year: 2021, status: "available" as const, msrp: 629.99, current: 684, delta: 12.4, series: randomWalk({ points: 45, start: 620, vol: 0.018, drift: 0.004, seed: 401 }) },
   { id: "75192", name: "Millennium Falcon Ultimate Collector Series", theme: "Star Wars", year: 2017, status: "retired" as const, msrp: 799.99, current: 982, delta: 4.1, series: randomWalk({ points: 45, start: 940, vol: 0.012, seed: 402 }) },
-  { id: "10255", name: "Assembly Square", theme: "Modular", year: 2017, status: "retiring-soon" as const, msrp: 279.99, current: 412, delta: -2.8, series: randomWalk({ points: 45, start: 425, vol: 0.02, drift: -0.002, seed: 403 }) },
-  { id: "21322", name: "Pirates of Barracuda Bay", theme: "Ideas", year: 2020, status: "exclusive" as const, msrp: 199.99, current: 620, delta: 18.5, series: randomWalk({ points: 45, start: 550, vol: 0.02, drift: 0.008, seed: 404 }) },
+  { id: "10255", name: "Assembly Square", theme: "Modular", year: 2017, status: "retired" as const, msrp: 279.99, current: 412, delta: -2.8, series: randomWalk({ points: 45, start: 425, vol: 0.02, drift: -0.002, seed: 403 }) },
+  { id: "21322", name: "Pirates of Barracuda Bay", theme: "Ideas", year: 2020, status: "retired" as const, msrp: 199.99, current: 620, delta: 18.5, series: randomWalk({ points: 45, start: 550, vol: 0.02, drift: 0.008, seed: 404 }) },
   { id: "42115", name: "Lamborghini Sián FKP 37", theme: "Technic", year: 2020, status: "available" as const, msrp: 379.99, current: 488, delta: 8.9, series: randomWalk({ points: 45, start: 450, vol: 0.022, drift: 0.003, seed: 405 }) },
   { id: "10276", name: "Colosseum", theme: "Creator Expert", year: 2020, status: "retired" as const, msrp: 549.99, current: 812, delta: 6.3, series: randomWalk({ points: 45, start: 780, vol: 0.015, drift: 0.002, seed: 406 }) },
   { id: "10307", name: "Eiffel Tower", theme: "Icons", year: 2022, status: "available" as const, msrp: 629.99, current: 698, delta: 3.1, series: randomWalk({ points: 45, start: 660, vol: 0.012, drift: 0.001, seed: 407 }) },
-  { id: "71043", name: "Hogwarts Castle", theme: "Harry Potter", year: 2018, status: "retiring-soon" as const, msrp: 399.99, current: 612, delta: 6.2, series: randomWalk({ points: 45, start: 580, vol: 0.016, drift: 0.002, seed: 408 }) },
+  { id: "71043", name: "Hogwarts Castle", theme: "Harry Potter", year: 2018, status: "retired" as const, msrp: 399.99, current: 612, delta: 6.2, series: randomWalk({ points: 45, start: 580, vol: 0.016, drift: 0.002, seed: 408 }) },
 ];
 
 export default function Home() {

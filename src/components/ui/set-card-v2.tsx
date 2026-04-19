@@ -8,13 +8,7 @@ import { cn } from "@/lib/utils/cn";
 import { Sparkline } from "@/components/charts/sparkline";
 import { DeltaChip } from "@/components/ui/delta-chip";
 import type { SeriesPoint } from "@/lib/mock/series";
-
-type SetStatus =
-  | "available"
-  | "retired"
-  | "retiring-soon"
-  | "exclusive"
-  | "unreleased";
+import type { SetStatus } from "@/lib/types/database";
 
 const statusPill: Record<SetStatus, { label: string; className: string }> = {
   available: {
@@ -26,16 +20,6 @@ const statusPill: Record<SetStatus, { label: string; className: string }> = {
     label: "Retired",
     className:
       "bg-[color-mix(in_oklab,var(--danger)_14%,transparent)] text-danger",
-  },
-  "retiring-soon": {
-    label: "Retiring soon",
-    className:
-      "bg-[color-mix(in_oklab,var(--warning)_14%,transparent)] text-warning",
-  },
-  exclusive: {
-    label: "Exclusive",
-    className:
-      "bg-[color-mix(in_oklab,var(--info)_14%,transparent)] text-info",
   },
   unreleased: {
     label: "Unreleased",

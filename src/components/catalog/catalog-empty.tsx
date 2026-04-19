@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 interface CatalogEmptyProps {
-  onClear: () => void;
+  onClear?: () => void;
 }
 
 /**
@@ -29,13 +29,15 @@ export function CatalogEmpty({ onClear }: CatalogEmptyProps) {
           clear a chip to see more.
         </p>
       </div>
-      <button
-        type="button"
-        onClick={onClear}
-        className="inline-flex items-center gap-2 rounded-full border border-border-emphasis bg-bg-raised px-4 py-2 text-small text-text-primary transition hover:bg-bg-overlay"
-      >
-        Clear filters
-      </button>
+      {onClear && (
+        <button
+          type="button"
+          onClick={onClear}
+          className="inline-flex items-center gap-2 rounded-full border border-border-emphasis bg-bg-raised px-4 py-2 text-small text-text-primary transition hover:bg-bg-overlay"
+        >
+          Clear filters
+        </button>
+      )}
     </div>
   );
 }

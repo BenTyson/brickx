@@ -3,7 +3,6 @@ import type {
   CatalogFilterOptions,
   CatalogResult,
   CatalogSearchParams,
-  CatalogSet,
   CatalogSortField,
 } from "@/lib/types/catalog";
 import type { SetStatus } from "@/lib/types/database";
@@ -66,6 +65,14 @@ export async function fetchCatalogSets(
     query = query.lte("msrp_usd", params.priceMax);
   }
 
+  // Parts range
+  if (params.partsMin != null) {
+    query = query.gte("num_parts", params.partsMin);
+  }
+  if (params.partsMax != null) {
+    query = query.lte("num_parts", params.partsMax);
+  }
+
   // Status filter
   if (params.status && params.status.length > 0) {
     query = query.in("status", params.status);
@@ -95,9 +102,7 @@ export async function fetchCatalogSets(
   }
 
   const totalCount = count ?? 0;
-  const sets: CatalogSet[] = ((data ?? []) as unknown as SetRow[]).map(
-    flattenSetRow,
-  );
+  const sets = ((data ?? []) as unknown as SetRow[]).map(flattenSetRow);
 
   return {
     sets,
@@ -140,6 +145,12 @@ export function parseCatalogSearchParams(
   const priceMax = getFloat(raw.priceMax);
   if (priceMax != null) params.priceMax = priceMax;
 
+  // Parts range
+  const partsMin = getInt(raw.partsMin);
+  if (partsMin != null) params.partsMin = partsMin;
+  const partsMax = getInt(raw.partsMax);
+  if (partsMax != null) params.partsMax = partsMax;
+
   // Status (comma-separated)
   const statusStr = getString(raw.status);
   if (statusStr) {
@@ -173,23 +184,17 @@ export function parseCatalogSearchParams(
 export async function fetchFilterOptions(): Promise<CatalogFilterOptions> {
   const supabase = await createClient();
 
-  // Fetch all in parallel
-  const [themesRes, yearRes, priceRes, statusRes] = await Promise.all([
-    // Theme counts: count sets per theme, join theme name
+  const [themesRes, yearRes, priceRes, statusRes, partsRes] = await Promise.all([
     supabase
       .from("sets")
       .select("theme_id, themes(name)")
       .not("theme_id", "is", null),
-
-    // Year range
     supabase
       .from("sets")
       .select("year")
       .order("year", { ascending: true })
       .limit(1)
       .single(),
-
-    // Price range
     supabase
       .from("sets")
       .select("msrp_usd")
@@ -197,12 +202,16 @@ export async function fetchFilterOptions(): Promise<CatalogFilterOptions> {
       .order("msrp_usd", { ascending: true })
       .limit(1)
       .single(),
-
-    // Status counts
     supabase.from("sets").select("status"),
+    supabase
+      .from("sets")
+      .select("num_parts")
+      .not("num_parts", "is", null)
+      .order("num_parts", { ascending: false })
+      .limit(1)
+      .single(),
   ]);
 
-  // Aggregate theme counts manually
   const themeCounts = new Map<number, { name: string; count: number }>();
   if (themesRes.data) {
     for (const row of themesRes.data) {
@@ -222,24 +231,22 @@ export async function fetchFilterOptions(): Promise<CatalogFilterOptions> {
     .map(([id, { name, count }]) => ({ id, name, count }))
     .sort((a, b) => b.count - a.count);
 
-  // Year range — fetch max separately
-  const yearMaxRes = await (await createClient())
-    .from("sets")
-    .select("year")
-    .order("year", { ascending: false })
-    .limit(1)
-    .single();
+  const [yearMaxRes, priceMaxRes] = await Promise.all([
+    supabase
+      .from("sets")
+      .select("year")
+      .order("year", { ascending: false })
+      .limit(1)
+      .single(),
+    supabase
+      .from("sets")
+      .select("msrp_usd")
+      .not("msrp_usd", "is", null)
+      .order("msrp_usd", { ascending: false })
+      .limit(1)
+      .single(),
+  ]);
 
-  // Price range — fetch max separately
-  const priceMaxRes = await (await createClient())
-    .from("sets")
-    .select("msrp_usd")
-    .not("msrp_usd", "is", null)
-    .order("msrp_usd", { ascending: false })
-    .limit(1)
-    .single();
-
-  // Status counts
   const statusCountMap = new Map<SetStatus, number>();
   if (statusRes.data) {
     for (const row of statusRes.data) {
@@ -263,6 +270,10 @@ export async function fetchFilterOptions(): Promise<CatalogFilterOptions> {
     priceRange: {
       min: priceRes.data?.msrp_usd ?? 0,
       max: priceMaxRes.data?.msrp_usd ?? 1000,
+    },
+    partsRange: {
+      min: 0,
+      max: partsRes.data?.num_parts ?? 12000,
     },
     statusCounts,
   };

@@ -28,3 +28,5 @@ export {
   fetchUnreadAlertCount,
   fetchNotificationPreferences,
 } from "./alerts";
+export { fetchThemes, fetchThemeDetail } from "./themes";
+export type { ThemeSummary, ThemeDetail } from "./themes";

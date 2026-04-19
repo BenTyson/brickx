@@ -1,5 +1,12 @@
 import { cn } from "@/lib/utils/cn";
-import type { SetDetailKeyStats } from "@/lib/mock/set-detail";
+
+export interface SetDetailKeyStats {
+  lastSale: number | null;
+  high30d: number | null;
+  low30d: number | null;
+  investmentScore: number | null;
+  pctChange90d: number | null;
+}
 
 interface KeyStatsStripProps {
   stats: SetDetailKeyStats;
@@ -14,35 +21,47 @@ interface Cell {
 }
 
 /**
- * StockX-style stats strip — last sale, 30d high/low, 30d volume, volatility.
- * Pure layout/typography, no JS.
+ * StockX-style stats strip — last sale, 30d high/low, investment score,
+ * 90d change. Values marked nullable so DB gaps degrade cleanly.
  */
 export function KeyStatsStrip({ stats, className }: KeyStatsStripProps) {
+  const fmtPrice = (v: number | null) =>
+    v == null ? "—" : `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  const fmtPct = (v: number | null) =>
+    v == null ? "—" : `${v >= 0 ? "+" : ""}${v.toFixed(2)}%`;
+  const fmtScore = (v: number | null) =>
+    v == null ? "—" : v.toFixed(1);
+
   const cells: Cell[] = [
     {
       label: "Last sale",
-      value: `$${stats.lastSale.toFixed(2)}`,
+      value: fmtPrice(stats.lastSale),
       hint: "blended",
     },
     {
       label: "30d high",
-      value: `$${stats.high30d.toFixed(0)}`,
+      value: fmtPrice(stats.high30d),
       tone: "success",
     },
     {
       label: "30d low",
-      value: `$${stats.low30d.toFixed(0)}`,
+      value: fmtPrice(stats.low30d),
       tone: "danger",
     },
     {
-      label: "30d volume",
-      value: `${stats.volume30d}`,
-      hint: "qty sold",
+      label: "90d change",
+      value: fmtPct(stats.pctChange90d),
+      tone:
+        stats.pctChange90d == null
+          ? "muted"
+          : stats.pctChange90d >= 0
+            ? "success"
+            : "danger",
     },
     {
-      label: "Volatility",
-      value: `${stats.volatility.toFixed(1)}%`,
-      hint: "annualized",
+      label: "Invest score",
+      value: fmtScore(stats.investmentScore),
+      hint: "0–100",
       tone: "muted",
     },
   ];
@@ -54,10 +73,7 @@ export function KeyStatsStrip({ stats, className }: KeyStatsStripProps) {
       )}
     >
       {cells.map((c) => (
-        <div
-          key={c.label}
-          className="flex flex-col gap-1 bg-card px-5 py-4"
-        >
+        <div key={c.label} className="flex flex-col gap-1 bg-card px-5 py-4">
           <span className="text-micro font-mono font-tabular tracking-[0.08em] text-text-tertiary">
             {c.label}
           </span>
