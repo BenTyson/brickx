@@ -213,17 +213,53 @@ export function PriceChartV2({
     return events.filter((e) => e.date >= first && e.date <= last);
   }, [events, chartData]);
 
+  const summary = useMemo(() => {
+    const primaryKey = activeKeys.has("new")
+      ? "new"
+      : (availableKeys.find((k) => activeKeys.has(k)) as PriceSeriesKey | undefined);
+    if (!primaryKey || !chartData.length) return null;
+    const values = chartData
+      .map((r) => r[primaryKey])
+      .filter((v): v is number => typeof v === "number");
+    if (values.length < 2) return null;
+    const first = values[0];
+    const last = values[values.length - 1];
+    const hi = Math.max(...values);
+    const lo = Math.min(...values);
+    const deltaPct = ((last - first) / first) * 100;
+    const dir = deltaPct >= 0 ? "up" : "down";
+    return {
+      seriesLabel: SERIES_LABEL[primaryKey],
+      first,
+      last,
+      hi,
+      lo,
+      deltaPct,
+      dir,
+      points: values.length,
+    };
+  }, [chartData, activeKeys, availableKeys]);
+
+  const summaryId = `${gradId}-summary`;
+
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-1 rounded-full border border-border-thin bg-bg-raised p-1">
+        <div
+          role="radiogroup"
+          aria-label="Chart time range"
+          className="flex items-center gap-1 rounded-full border border-border-thin bg-bg-raised p-1"
+        >
           {RANGES.map((r) => (
             <button
               key={r}
               type="button"
+              role="radio"
+              aria-checked={range === r}
+              aria-label={`Show ${r === "ALL" ? "all history" : `last ${r}`}`}
               onClick={() => setRange(r)}
               className={cn(
-                "rounded-full px-3 py-1 text-[11px] font-mono font-tabular uppercase tracking-[0.08em] transition",
+                "rounded-full px-3 py-1 text-[11px] font-mono font-tabular uppercase tracking-[0.08em] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base",
                 range === r
                   ? "bg-accent text-accent-foreground"
                   : "text-text-tertiary hover:text-text-primary",
@@ -233,16 +269,22 @@ export function PriceChartV2({
             </button>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div
+          className="flex flex-wrap items-center gap-2"
+          role="group"
+          aria-label="Visible price series"
+        >
           {availableKeys.map((k) => {
             const isOn = activeKeys.has(k);
             return (
               <button
                 key={k}
                 type="button"
+                aria-pressed={isOn}
+                aria-label={`${isOn ? "Hide" : "Show"} ${SERIES_LABEL[k]} series`}
                 onClick={() => toggle(k)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] transition",
+                  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base",
                   isOn
                     ? "border-border-emphasis bg-bg-overlay text-text-primary"
                     : "border-border-thin text-text-tertiary hover:text-text-secondary",
@@ -251,6 +293,7 @@ export function PriceChartV2({
                 <span
                   className="size-1.5 rounded-full"
                   style={{ backgroundColor: SERIES_COLOR[k] }}
+                  aria-hidden
                 />
                 {SERIES_LABEL[k]}
               </button>
@@ -259,9 +302,21 @@ export function PriceChartV2({
         </div>
       </div>
 
+      {summary && (
+        <p id={summaryId} className="sr-only">
+          {`Price chart, ${summary.seriesLabel} series, ${summary.points} data points over ${range === "ALL" ? "all history" : `the last ${range}`}. ` +
+            `From $${summary.first.toFixed(0)} to $${summary.last.toFixed(0)}, ` +
+            `${summary.dir} ${Math.abs(summary.deltaPct).toFixed(1)} percent. ` +
+            `High $${summary.hi.toFixed(0)}, low $${summary.lo.toFixed(0)}.`}
+        </p>
+      )}
+
       <motion.div
         style={{ height }}
         className="w-full"
+        role="img"
+        aria-label="Price history chart"
+        aria-describedby={summary ? summaryId : undefined}
         initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: reduceMotion ? 0.15 : 0.5, ease: [0.16, 1, 0.3, 1] }}

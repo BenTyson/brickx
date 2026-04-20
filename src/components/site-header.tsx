@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { MobileNav } from "@/components/mobile-nav";
+import { MobileBottomNav } from "@/components/mobile-bottom-nav";
 import { UserMenu } from "@/components/auth/user-menu";
 import { NotificationBell } from "@/components/alerts/notification-bell";
 import { Button } from "@/components/ui/button";
@@ -15,8 +16,16 @@ const navLinks = [
   { href: "/portfolio", label: "Portfolio" },
 ];
 
-export function SiteHeader({ className }: { className?: string }) {
+export function SiteHeader({
+  className,
+  showMobileBottomNav = true,
+}: {
+  className?: string;
+  /** Hide the mobile bottom tab bar (e.g. on auth / onboarding surfaces). */
+  showMobileBottomNav?: boolean;
+}) {
   return (
+    <>
     <header
       className={cn(
         "bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur",
@@ -52,5 +61,7 @@ export function SiteHeader({ className }: { className?: string }) {
         </div>
       </nav>
     </header>
+    {showMobileBottomNav && <MobileBottomNav />}
+    </>
   );
 }

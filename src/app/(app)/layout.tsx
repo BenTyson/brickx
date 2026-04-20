@@ -31,7 +31,7 @@ export default async function AppLayout({
   return (
     <>
       <SiteHeader />
-      <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+      <main className="min-h-[calc(100vh-4rem)] pb-20 md:pb-0">{children}</main>
       <SiteFooter />
     </>
   );
