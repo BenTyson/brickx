@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bell, Check, Eye, Trash2, X } from "lucide-react";
+import { Check, Eye, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { BellIllustration } from "@/components/illustrations";
 import {
   Card,
   CardContent,
@@ -63,13 +65,19 @@ export function AlertList({ alerts }: AlertListProps) {
 
   if (alerts.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16">
-        <Bell className="text-muted-foreground/50 mb-4 size-12" />
-        <p className="text-muted-foreground text-lg">No alerts yet</p>
-        <p className="text-muted-foreground mt-1 text-sm">
-          Create alerts from any set detail page to track price changes.
-        </p>
-      </div>
+      <EmptyState
+        illustration={<BellIllustration />}
+        title="Quiet as a Saturday morning."
+        description="Create alerts from any set detail page and we'll ping you the moment prices move."
+        action={
+          <Link
+            href="/sets"
+            className="inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-small text-accent-foreground transition hover:bg-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg-base"
+          >
+            Browse sets
+          </Link>
+        }
+      />
     );
   }
 

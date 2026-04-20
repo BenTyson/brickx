@@ -9,7 +9,7 @@ export default function SetsLayout({
   return (
     <>
       <SiteHeader />
-      <main>{children}</main>
+      <main className="pb-20 md:pb-0">{children}</main>
       <SiteFooter />
     </>
   );

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { FolderOpen } from "lucide-react";
 import { PageContainer } from "@/components/page-container";
 import { fetchUserCollections } from "@/lib/queries";
 import { CollectionCard } from "@/components/collections/collection-card";
 import { CreateCollectionDialog } from "@/components/collections/create-collection-dialog";
+import { EmptyState } from "@/components/ui/empty-state";
+import { FoldersIllustration } from "@/components/illustrations";
 
 export const metadata: Metadata = {
   title: "My Collections | BrickX",
@@ -26,17 +27,12 @@ export default async function CollectionsPage() {
       </div>
 
       {collections.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
-          <FolderOpen className="text-muted-foreground/50 mb-4 size-12" />
-          <h2 className="text-lg font-semibold">No collections yet</h2>
-          <p className="text-muted-foreground mt-1 max-w-sm text-sm">
-            Create your first collection to start tracking your LEGO sets and
-            their value.
-          </p>
-          <div className="mt-4">
-            <CreateCollectionDialog />
-          </div>
-        </div>
+        <EmptyState
+          illustration={<FoldersIllustration />}
+          title="Make room for the first one."
+          description="Group your sets by theme, era, or shelf. Collections make portfolio math and bulk actions tidy."
+          action={<CreateCollectionDialog />}
+        />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {collections.map((collection) => (
