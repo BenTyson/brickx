@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 import { Sparkline } from "@/components/charts/sparkline";
 import { DeltaChip } from "@/components/ui/delta-chip";
+import type { SeriesPoint } from "@/lib/mock/series";
 import {
   COLLECTIONS,
   HOLDINGS,
@@ -12,16 +13,31 @@ import {
   type Holding,
 } from "@/lib/mock/portfolio";
 
+export interface CollectionsStripRow {
+  id: string;
+  name: string;
+  setCount: number;
+  itemCount: number;
+  value: number;
+  delta30d: number;
+  gainPct: number;
+  series: SeriesPoint[];
+  tintColor: string;
+}
+
 interface CollectionsStripProps {
   className?: string;
   hrefPrefix?: string;
+  /** When provided, replaces the mock-generated cards. */
+  rows?: CollectionsStripRow[];
 }
 
 export function CollectionsStrip({
   className,
   hrefPrefix = "/demo/collections",
+  rows: rowsProp,
 }: CollectionsStripProps) {
-  const rows = COLLECTIONS.map((c) => buildCollectionCard(c, HOLDINGS));
+  const rows = rowsProp ?? COLLECTIONS.map((c) => buildCollectionCard(c, HOLDINGS));
 
   return (
     <section className={cn("flex flex-col gap-3", className)}>

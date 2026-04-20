@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { PageContainer } from "@/components/page-container";
-import { SetCard } from "@/components/set-card";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { PeriodToggle } from "@/components/market/period-toggle";
 import { MarketPagination } from "@/components/market/market-pagination";
 import { fetchTrendingSets } from "@/lib/queries";
+import { TrendingTable } from "@/components/market-v2/trending-table";
+import { buildTrendRows } from "@/lib/queries/market-live";
 
 export const metadata: Metadata = {
   title: "Trending Sets | BrickX",
@@ -23,29 +25,49 @@ export default async function TrendingPage({
   const page = Math.max(1, parseInt(String(raw.page ?? "1"), 10) || 1);
 
   const result = await fetchTrendingSets(period, page);
+  const rows = buildTrendRows(result.sets, period);
 
   return (
-    <div className="py-8">
-      <PageContainer className="space-y-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <main className="bg-bg-base pb-24">
+      <div className="mx-auto max-w-[1320px] px-6 pt-8 sm:px-10 lg:px-14">
+        <Link
+          href="/market"
+          className="inline-flex items-center gap-1 text-micro font-mono font-tabular uppercase tracking-[0.08em] text-text-tertiary transition hover:text-text-primary"
+        >
+          <ChevronLeft className="size-3" aria-hidden />
+          Market hub
+        </Link>
+      </div>
+
+      <div className="mx-auto max-w-[1320px] px-6 pb-6 pt-4 sm:px-10 lg:px-14">
+        <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Trending Sets</h1>
-            <p className="text-muted-foreground mt-1">
-              Sets with the biggest price changes over the past{" "}
+            <div className="text-micro font-mono font-tabular tracking-[0.08em] text-text-tertiary">
+              Trending
+            </div>
+            <h1 className="mt-2 font-serif-display text-[44px] leading-[1.02] tracking-tight text-text-primary sm:text-[56px]">
+              Who&rsquo;s moving.
+            </h1>
+            <p className="mt-3 max-w-xl text-small text-text-secondary leading-relaxed">
+              Sets ranked by price change over the past{" "}
               {period === "7d" ? "7 days" : "30 days"}.
             </p>
           </div>
           <PeriodToggle currentPeriod={period} />
         </div>
+      </div>
 
+      <div className="mx-auto flex max-w-[1320px] flex-col gap-6 px-6 sm:px-10 lg:px-14">
         {result.sets.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {result.sets.map((set) => (
-              <SetCard key={set.id} set={set} />
-            ))}
-          </div>
+          <TrendingTable
+            defaultPeriod={period}
+            showLosers
+            rows={rows}
+            setHrefPrefix="/sets"
+            hidePeriodToggle
+          />
         ) : (
-          <p className="text-muted-foreground py-12 text-center">
+          <p className="py-12 text-center text-small text-text-tertiary">
             No trending sets found for this period.
           </p>
         )}
@@ -57,7 +79,7 @@ export default async function TrendingPage({
           pageSize={result.pageSize}
           basePath="/market/trending"
         />
-      </PageContainer>
-    </div>
+      </div>
+    </main>
   );
 }

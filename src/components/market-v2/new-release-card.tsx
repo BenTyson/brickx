@@ -6,16 +6,21 @@ import type { NewReleaseEntry } from "@/lib/mock/indices";
 
 interface NewReleaseCardProps {
   entry: NewReleaseEntry;
+  setHrefPrefix?: string;
   className?: string;
 }
 
-export function NewReleaseCard({ entry, className }: NewReleaseCardProps) {
+export function NewReleaseCard({
+  entry,
+  setHrefPrefix = "/demo/sets",
+  className,
+}: NewReleaseCardProps) {
   const { set, daysOnMarket, priceVsMsrp, first30d } = entry;
   const isAboveMsrp = priceVsMsrp >= 0;
 
   return (
     <Link
-      href={`/demo/sets/${set.id}`}
+      href={`${setHrefPrefix}/${set.id}`}
       className={cn(
         "group flex flex-col gap-3 rounded-2xl border border-border-thin bg-bg-raised p-5 transition hover:border-border-emphasis hover:shadow-[0_0_0_1px_rgba(255,255,255,0.04)]",
         className,
