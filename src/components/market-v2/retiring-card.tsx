@@ -6,6 +6,7 @@ import type { RetiringSoonEntry } from "@/lib/mock/indices";
 
 interface RetiringCardProps {
   entry: RetiringSoonEntry;
+  setHrefPrefix?: string;
   className?: string;
 }
 
@@ -30,7 +31,11 @@ function RiskBar({ score }: { score: number }) {
   );
 }
 
-export function RetiringCard({ entry, className }: RetiringCardProps) {
+export function RetiringCard({
+  entry,
+  setHrefPrefix = "/demo/sets",
+  className,
+}: RetiringCardProps) {
   const { set, monthsLeft, retirementAppreciation, riskScore, sparkline } = entry;
   const urgency = monthsLeft <= 3 ? "danger" : monthsLeft <= 6 ? "warning" : "muted";
   const urgencyColor =
@@ -42,7 +47,7 @@ export function RetiringCard({ entry, className }: RetiringCardProps) {
 
   return (
     <Link
-      href={`/demo/sets/${set.id}`}
+      href={`${setHrefPrefix}/${set.id}`}
       className={cn(
         "group flex flex-col gap-3 rounded-2xl border border-border-thin bg-bg-raised p-5 transition hover:border-border-emphasis hover:shadow-[0_0_0_1px_rgba(255,255,255,0.04)]",
         className,

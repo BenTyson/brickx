@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { PageContainer } from "@/components/page-container";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { SetCard } from "@/components/set-card";
 import { PriceRangeFilter } from "@/components/market/price-range-filter";
 import { MarketPagination } from "@/components/market/market-pagination";
@@ -30,16 +31,31 @@ export default async function TopInvestmentsPage({
   );
 
   return (
-    <div className="py-8">
-      <PageContainer className="space-y-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Top Investments</h1>
-          <p className="text-muted-foreground mt-1">
-            Sets ranked by investment score. Filter by MSRP to find
-            opportunities in your budget.
-          </p>
-        </div>
+    <main className="bg-bg-base pb-24">
+      <div className="mx-auto max-w-[1320px] px-6 pt-8 sm:px-10 lg:px-14">
+        <Link
+          href="/market"
+          className="inline-flex items-center gap-1 text-micro font-mono font-tabular uppercase tracking-[0.08em] text-text-tertiary transition hover:text-text-primary"
+        >
+          <ChevronLeft className="size-3" aria-hidden />
+          Market hub
+        </Link>
+      </div>
 
+      <div className="mx-auto max-w-[1320px] px-6 pb-6 pt-4 sm:px-10 lg:px-14">
+        <div className="text-micro font-mono font-tabular tracking-[0.08em] text-text-tertiary">
+          Top Investments
+        </div>
+        <h1 className="mt-2 font-serif-display text-[44px] leading-[1.02] tracking-tight text-text-primary sm:text-[56px]">
+          Scored and ranked.
+        </h1>
+        <p className="mt-3 max-w-xl text-small text-text-secondary leading-relaxed">
+          Sets ranked by proprietary investment score — a blend of price trend,
+          retirement proximity, and historical appreciation. Filter by MSRP.
+        </p>
+      </div>
+
+      <div className="mx-auto flex max-w-[1320px] flex-col gap-6 px-6 sm:px-10 lg:px-14">
         <PriceRangeFilter currentMin={priceMin} currentMax={priceMax} />
 
         {result.sets.length > 0 ? (
@@ -49,7 +65,7 @@ export default async function TopInvestmentsPage({
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground py-12 text-center">
+          <p className="py-12 text-center text-small text-text-tertiary">
             No sets found matching the specified criteria.
           </p>
         )}
@@ -61,7 +77,7 @@ export default async function TopInvestmentsPage({
           pageSize={result.pageSize}
           basePath="/market/top-investments"
         />
-      </PageContainer>
-    </div>
+      </div>
+    </main>
   );
 }

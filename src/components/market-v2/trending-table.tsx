@@ -21,17 +21,24 @@ const PERIODS: Array<{ key: TrendPeriod; label: string }> = [
 interface TrendingTableProps {
   defaultPeriod?: TrendPeriod;
   showLosers?: boolean;
+  /** When provided, overrides mock-generated rows — used by live /market/trending. */
+  rows?: { gainers: TrendRow[]; losers: TrendRow[] };
+  setHrefPrefix?: string;
+  hidePeriodToggle?: boolean;
   className?: string;
 }
 
 export function TrendingTable({
   defaultPeriod = "30d",
   showLosers = true,
+  rows,
+  setHrefPrefix = "/demo/sets",
+  hidePeriodToggle = false,
   className,
 }: TrendingTableProps) {
   const [period, setPeriod] = useState<TrendPeriod>(defaultPeriod);
-  const gainers = trendingGainers(period, 12);
-  const losers = trendingLosers(period, 8);
+  const gainers = rows?.gainers ?? trendingGainers(period, 12);
+  const losers = rows?.losers ?? trendingLosers(period, 8);
 
   return (
     <section className={cn("rounded-2xl border border-border-thin bg-bg-raised", className)}>
@@ -43,6 +50,7 @@ export function TrendingTable({
             Gainers &amp; losers.
           </div>
         </div>
+        {!hidePeriodToggle && (
         <div className="flex items-center gap-0.5 rounded-full border border-border-thin bg-bg-overlay p-1">
           {PERIODS.map((p) => (
             <button
@@ -60,16 +68,24 @@ export function TrendingTable({
             </button>
           ))}
         </div>
+        )}
       </div>
 
       <div className={cn("grid gap-0", showLosers && "sm:grid-cols-2")}>
-        <TrendColumn title="Gainers" tone="success" rows={gainers} period={period} />
+        <TrendColumn
+          title="Gainers"
+          tone="success"
+          rows={gainers}
+          period={period}
+          hrefPrefix={setHrefPrefix}
+        />
         {showLosers && (
           <TrendColumn
             title="Losers"
             tone="danger"
             rows={losers}
             period={period}
+            hrefPrefix={setHrefPrefix}
             className="border-t border-border-thin sm:border-l sm:border-t-0"
           />
         )}
@@ -83,12 +99,14 @@ function TrendColumn({
   tone,
   rows,
   period,
+  hrefPrefix,
   className,
 }: {
   title: string;
   tone: "success" | "danger";
   rows: TrendRow[];
   period: TrendPeriod;
+  hrefPrefix: string;
   className?: string;
 }) {
   return (
@@ -125,7 +143,7 @@ function TrendColumn({
         {rows.map((row) => (
           <li key={row.set.id}>
             <Link
-              href={`/demo/sets/${row.set.id}`}
+              href={`${hrefPrefix}/${row.set.id}`}
               className="group grid grid-cols-[2rem_minmax(0,1fr)_5rem_4.5rem_5rem] items-center gap-2 px-5 py-2.5 transition hover:bg-bg-overlay sm:px-6"
             >
               <span className="font-mono font-tabular text-micro tabular-nums text-text-quaternary">
